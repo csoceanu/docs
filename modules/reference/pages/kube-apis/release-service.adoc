@@ -1,3 +1,4 @@
+```adoc
 // Generated documentation. Please do not edit.
 :anchor_prefix: k8s-api
 
@@ -659,5 +660,4 @@ ValidationInfo defines the observed state of the release validation.
 | *`failedPostValidation`* __boolean__ | FailedPostValidation indicates whether the Release was marked as invalid after being initially marked as valid + |  | 
 | *`time`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | Time is the time when the Release was validated or when the validation state changed + |  | 
 |===
-
-
+```
