@@ -1,4 +1,3 @@
-```adoc
 // Generated documentation. Please do not edit.
 :anchor_prefix: k8s-api
 
@@ -582,4 +581,3 @@ Target references where this relesae is intended to be released to
 | *`workspace`* __string__ | Workspace references a KCP workspace within the cluster + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])(:[a-z0-9]([-a-z0-9]*[a-z0-9]))*$` +
 
 |===
-```
