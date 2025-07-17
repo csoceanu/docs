@@ -463,6 +463,9 @@ ReleaseServiceConfigSpec defines the desired state of ReleaseServiceConfig.
 in debug mode + |  | 
 | *`defaultTimeouts`* __xref:{anchor_prefix}-github-com-tektoncd-pipeline-pkg-apis-pipeline-v1-timeoutfields[$$TimeoutFields$$]__ | DefaultTimeouts contain the default Tekton timeouts to be used in case they are +
 not specified in the ReleasePlanAdmission resource. + |  | 
+| *`notificationSettings`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-notificationsettings[$$NotificationSettings$$]__ | NotificationSettings configure how release notifications are sent to different stakeholders during the release process + |  | 
+| *`resourceLimits`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-resourcelimits[$$ResourceLimits$$]__ | ResourceLimits define constraints on resource usage during release operations to prevent excessive consumption of cluster resources + |  | 
+| *`securityPolicies`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-securitypolicies[$$SecurityPolicies$$]__ | SecurityPolicies define security requirements and constraints that must be enforced during the release process + |  | 
 |===
 
 
@@ -557,4 +560,129 @@ Target references where this relesae is intended to be released to
 
 | *`workspace`* __string__ | Workspace references a KCP workspace within the cluster + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])(:[a-z0-9]([-a-z0-9]*[a-z0-9]))*$` +
 
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-notificationsettings"]
+==== NotificationSettings
+
+NotificationSettings configure how release notifications are sent to different stakeholders during the release process
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfigspec[$$ReleaseServiceConfigSpec$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`email`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-emailnotificationsettings[$$EmailNotificationSettings$$]__ | Email notification configuration + |  | 
+| *`slack`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-slacknotificationsettings[$$SlackNotificationSettings$$]__ | Slack notification configuration + |  | 
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-emailnotificationsettings"]
+==== EmailNotificationSettings
+
+Email notification configuration
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-notificationsettings[$$NotificationSettings$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`enabled`* __boolean__ | Enabled determines if email notifications are active + |  | 
+| *`onFailure`* __boolean__ | OnFailure sends notifications when releases fail + |  | 
+| *`onSuccess`* __boolean__ | OnSuccess sends notifications when releases succeed + |  | 
+| *`recipients`* __string array__ | Recipients is a list of email addresses to notify + |  | 
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-slacknotificationsettings"]
+==== SlackNotificationSettings
+
+Slack notification configuration
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-notificationsettings[$$NotificationSettings$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`channel`* __string__ | Channel specifies the Slack channel to notify + |  | 
+| *`enabled`* __boolean__ | Enabled determines if Slack notifications are active + |  | 
+| *`webhookURL`* __string__ | WebhookURL is the Slack webhook URL for notifications + |  | 
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-securitypolicies"]
+==== SecurityPolicies
+
+SecurityPolicies define security requirements and constraints that must be enforced during the release process
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfigspec[$$ReleaseServiceConfigSpec$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`allowedRegistries`* __string array__ | AllowedRegistries is a list of container registries that releases can target + |  | 
+| *`requireCodeSigning`* __boolean__ | RequireCodeSigning enforces that all artifacts must be digitally signed + |  | 
+| *`vulnerabilityScanning`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-vulnerabilityscanning[$$VulnerabilityScanning$$]__ | VulnerabilityScanning configuration for security checks + |  | 
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-vulnerabilityscanning"]
+==== VulnerabilityScanning
+
+VulnerabilityScanning configuration for security checks
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-securitypolicies[$$SecurityPolicies$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`enabled`* __boolean__ | Enabled determines if vulnerability scanning is required + |  | 
+| *`maxCriticalVulnerabilities`* __integer__ | MaxCriticalVulnerabilities sets the maximum allowed critical CVEs + |  | 
+| *`maxHighVulnerabilities`* __integer__ | MaxHighVulnerabilities sets the maximum allowed high-severity CVEs + |  | 
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-resourcelimits"]
+==== ResourceLimits
+
+ResourceLimits define constraints on resource usage during release operations to prevent excessive consumption of cluster resources
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfigspec[$$ReleaseServiceConfigSpec$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`maxConcurrentReleases`* __integer__ | MaxConcurrentReleases limits how many releases can run simultaneously + |  | 
+| *`pipelineResourceLimits`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelineresourcelimits[$$PipelineResourceLimits$$]__ | PipelineResourceLimits set CPU and memory constraints for release pipelines + |  | 
+| *`timeoutGracePeriod`* __string__ | TimeoutGracePeriod defines how long to wait before forcefully terminating stuck releases + |  | 
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelineresourcelimits"]
+==== PipelineResourceLimits
+
+PipelineResourceLimits set CPU and memory constraints for release pipelines
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-resourcelimits[$$ResourceLimits$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`cpu`* __string__ | CPU limit for release pipeline execution + |  | 
+| *`memory`* __string__ | Memory limit for release pipeline execution + |  | 
 |===
