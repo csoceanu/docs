@@ -77,29 +77,6 @@ ServiceAccount to be used in the PipelineRun.
 |===
 
 
-[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-emptydiroverrides"]
-==== EmptyDirOverrides
-
-
-
-EmptyDirOverrides defines the values usually set in a PipelineRef using a git resolver.
-
-
-
-.Appears In:
-****
-- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfigspec[$$ReleaseServiceConfigSpec$$]
-****
-
-[cols="20a,50a,15a,15a", options="header"]
-|===
-| Field | Description | Default | Validation
-| *`url`* __string__ | Url is the url to the git repo + |  | 
-| *`revision`* __string__ | Revision is the git revision where the Pipeline definition can be found + |  | 
-| *`pathInRepo`* __string__ | PathInRepo is the path within the git repository where the Pipeline definition can be found + |  | 
-|===
-
-
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplan"]
 ==== MatchedReleasePlan
 
@@ -481,11 +458,11 @@ ReleaseServiceConfigSpec defines the desired state of ReleaseServiceConfig.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
+| *`advisoryRepo`* __string__ | AdvisoryRepo is the repo to create advisories in during the managed release PipelineRun + |  | 
 | *`debug`* __boolean__ | Debug is the boolean that specifies whether or not the Release Service should run +
 in debug mode + |  | 
 | *`defaultTimeouts`* __xref:{anchor_prefix}-github-com-tektoncd-pipeline-pkg-apis-pipeline-v1-timeoutfields[$$TimeoutFields$$]__ | DefaultTimeouts contain the default Tekton timeouts to be used in case they are +
 not specified in the ReleasePlanAdmission resource. + |  | 
-| *`EmptyDirOverrides`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-emptydiroverrides[$$EmptyDirOverrides$$] array__ | VolumeOverrides is a map containing the volume type for specific Pipeline git refs + |  | 
 |===
 
 
