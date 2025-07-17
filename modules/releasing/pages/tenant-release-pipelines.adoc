@@ -17,7 +17,7 @@ Before starting to use a tenant pipeline there are some prerequisites you will h
 To use a tenant pipeline:
 
 . Follow the regular instruction to xref:releasing:create-release-plan.adoc[create a ReleasePlan] YAML file locally.
-. Specify the details about the tenant pipeline to run using the `tenantPipeline` field.
+. Specify the details about the tenant pipeline to run using the `pipelineRef` field and `serviceAccount` field.
 
 +
 *Example `ReleasePlan.yaml` object*
@@ -45,20 +45,19 @@ spec:
           repository: registry/destination-image-repository-2
           tags: [latest]
   target: managed-tenant-namespace
-  tenantPipeline:
+  pipelineRef: <.>
     params: <.>
     - name: paramForPipeline
       value: foo
-    pipelineRef: <.>
-      resolver: git
-      params:
-        - name: url
-          value: "https://github.com/<your-github-user>/<your-pipeline-repo>.git"
-        - name: revision
-          value: main
-        - name: pathInRepo
-          value: "<path-to-your-pipeline>"
-    serviceAccountName: build-pipeline-$COMPONENT_NAME <.>
+    resolver: git
+    params:
+      - name: url
+        value: "https://github.com/<your-github-user>/<your-pipeline-repo>.git"
+      - name: revision
+        value: main
+      - name: pathInRepo
+        value: "<path-to-your-pipeline>"
+  serviceAccount: build-pipeline-$COMPONENT_NAME <.>
 ----
 
 +
@@ -66,8 +65,8 @@ spec:
 <.> The development team's tenant namespace.
 <.> The name of the application that you want to release via a pipeline in the development tenant namespace.
 <.> A list containing the destination repository for each component
-<.> The parameters to pass to your pipeline. Note: the release-operator will automatically pass parameters `taskGitRevision` and `taskGitUrl` with the same values as the `pipelineRef` `revision` and `pipelineRef` `url` parameters respectively. So, you should not pass your own values for these two parameters in this section. If you do, tekton validation webhooks will block the pipelineRun creation.
 <.> Reference to the tenant pipeline to be executed in the development tenant namespace.
+<.> The parameters to pass to your pipeline. Note: the release-operator will automatically pass parameters `taskGitRevision` and `taskGitUrl` with the same values as the `pipelineRef` `revision` and `pipelineRef` `url` parameters respectively. So, you should not pass your own values for these two parameters in this section. If you do, tekton validation webhooks will block the pipelineRun creation.
 <.> The name of the service account used to execute the tenant pipeline.
 
 . In case you want to avoid the execution of a managed pipeline, remove the `target` field from your `ReleasePlan.yaml` file.

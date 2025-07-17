@@ -25,14 +25,14 @@ The development team creates a `Release` object in the developer tenant namespac
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: Release
 metadata:
- name: <name-of-this-release> <.>
- namespace: dev-tenant-namespace <.>
+  name: <name-of-this-release> <.>
+  namespace: dev-tenant-namespace <.>
 spec:
- releasePlan: <release-plan-name> <.>
- snapshot: <application-snapshot-name> <.>
- target: <.>
-   namespace: <target-namespace-for-release> <.>
-   workspace: <target-workspace-for-release> <.>
+  releasePlan: <release-plan-name> <.>
+  snapshot: <application-snapshot-name> <.>
+  target: <.>
+    namespace: <target-namespace-for-release> <.>
+    workspace: <target-workspace-for-release> <.>
 ----
 
 
