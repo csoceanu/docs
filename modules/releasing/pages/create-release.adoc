@@ -30,8 +30,9 @@ metadata:
 spec:
  releasePlan: <release-plan-name> <.>
  snapshot: <application-snapshot-name> <.>
- releaseType: <type-of-release> <.>
- data: <key> <.>
+ target: <.>
+   namespace: <target-namespace-for-release> <.>
+   workspace: <target-workspace-for-release> <.>
 ----
 
 
@@ -40,8 +41,9 @@ spec:
 <.> The development team's tenant namespace.
 <.> The name of the release plan specifying the pipeline to run.
 <.> The name of the application snapshot that you want to release.
-<.> The type of the release (e.g., major, minor, patch).
-<.> Optional: An unstructured key used for providing data for the managed Pipeline.
+<.> The target for this release. This field indicates where the release is intended to be released.
+<.> The target namespace within the cluster where the release is intended to be released.
+<.> The target KCP workspace within the cluster where the release is intended to be released.
 
 . In the development tenant namespace, apply the `Release.yaml` file and add the resource to your cluster by running the following command:
 
