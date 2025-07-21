@@ -526,16 +526,81 @@ ReleaseStatus defines the observed state of Release.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time the Release PipelineRun completed + |  | 
+| *`automated`* __boolean__ | Automated indicates whether the Release was created as part of an automated process or manually by an end-user + |  | 
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when a Release was completed + |  | 
 | *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the release + |  | 
-| *`releasePipelineRun`* __string__ | ReleasePipelineRun contains the namespaced name of the release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-| *`releaseStrategy`* __string__ | ReleaseStrategy contains the namespaced name of the ReleaseStrategy used for this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-| *`snapshotEnvironmentBinding`* __string__ | SnapshotEnvironmentBinding contains the namespaced name of the SnapshotEnvironmentBinding created as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release PipelineRun was created and set to run + |  | 
+| *`expirationTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | ExpirationTime is the time when a Release can be purged + |  | 
+| *`managedProcessing`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusmanagedprocessing[$$ReleaseStatusManagedProcessing$$]__ | ManagedProcessing contains information about the release managed processing + |  | 
+| *`postActionsExecution`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatuspostactionsexecution[$$ReleaseStatusPostActionsExecution$$]__ | PostActionsExecution contains information about the post-actions execution + |  | 
+| *`processing`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusprocessing[$$ReleaseStatusProcessing$$]__ | Processing contains information about the release processing + |  | 
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when a Release was started + |  | 
 | *`target`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-target[$$Target$$]__ | Target references where this relesae is intended to be released to + |  | 
+|===
+
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusmanagedprocessing"]
+==== ReleaseStatusManagedProcessing
+
+ManagedProcessing contains information about the release managed processing
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release processing was completed + |  | 
+| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`roleBinding`* __string__ | RoleBinding contains the namespaced name of the roleBinding created for the managed Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release processing started + |  | 
+|===
+
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatuspostactionsexecution"]
+==== ReleaseStatusPostActionsExecution
+
+PostActionsExecution contains information about the post-actions execution
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release processing was completed + |  | 
+| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`roleBinding`* __string__ | RoleBinding contains the namespaced name of the roleBinding created for the managed Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release processing started + |  | 
+|===
+
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusprocessing"]
+==== ReleaseStatusProcessing
+
+Processing contains information about the release processing
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release processing was completed + |  | 
+| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`roleBinding`* __string__ | RoleBinding contains the namespaced name of the roleBinding created for the managed Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release processing started + |  | 
 |===
 
 
