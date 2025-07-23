@@ -2,7 +2,7 @@
 
 A ReleasePlanAdmission (RPA) CR exists within a managed tenant namespace. It defines the specific pipeline to run and a given xref:compliance:index.adoc[Conforma] Policy which needs to pass for the Snapshot before that pipeline can proceed.
 
-When an application is ready for release, the Development team contacts the owners of the managed tenant namespace (for example, their organization's SRE team) and  requests access to the managed tenant namespace. A RPA object is then created in the managed tenant namespace to specify the configuration.
+When an application is ready for release, the Development team contacts the owners of the managed tenant namespace (for example, their organization's SRE team) and requests access to the managed tenant namespace. A RPA object is then created in the managed tenant namespace to specify the configuration.
 
 == Creating a `ReleasePlanAdmission` object
 
@@ -38,7 +38,6 @@ spec:
  pipelineRef: <pipeline_ref> <.>
  policy: <policy> <.>
  serviceAccount: <service-account> <.>
-
 ----
 
 +
@@ -46,15 +45,15 @@ spec:
 <.> The name of the release plan admission.
 <.> The Managed environment team's tenant namespace.
 <.> A list of applications that you want to enable to be deployed in the managed tenant namespace.
-<.> Optional: An unstructured key used for providing data for the managed Pipeline.
+<.> Optional: An unstructured key used for providing data for the release Pipeline.
 <.> Optional: The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
 <.> The development team tenant namespace where the application is defined.
 <.> Reference to the Pipeline to be executed by the release service.
 <.> The enterprise contract policy against which the system validates an application before releasing it to production.
-<.> Optional: The name of the service account to use in the Pipeline to gain elevated privileges. It's used only if you have defined the `pipelineRef` value.
+<.> Optional: The name of the service account to use in the release PipelineRun to gain elevated privileges. It's used only if you have defined the `pipelineRef` value.
 
 +
-NOTE: The  ReleasePlanAdmission.yaml represents the reciprocal link to the ReleasePlan.yaml objects created by the development team.
+NOTE: The ReleasePlanAdmission.yaml represents the reciprocal link to the ReleasePlan.yaml objects created by the development team.
 
 . In the Managed tenant namespace, apply the `ReleasePlanAdmission.yaml` file and add the resource to your cluster by running the following command:
 

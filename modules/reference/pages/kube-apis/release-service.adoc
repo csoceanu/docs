@@ -25,58 +25,6 @@ Package v1alpha1 contains API Schema definitions for the appstudio v1alpha1 API 
 
 
 
-[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectoritem"]
-==== CollectorItem
-
-
-
-CollectorItem represents all the information about an specific collector which will be executed in the
-CollectorsPipeline.
-
-
-
-.Appears In:
-****
-- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectors[$$Collectors$$]
-****
-
-[cols="20a,50a,15a,15a", options="header"]
-|===
-| Field | Description | Default | Validation
-| *`name`* __string__ | Name of the collector + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-| *`timeout`* __integer__ | Timeout in seconds for the collector to execute + |  |
-| *`type`* __string__ | Type is the type of collector to be used + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-| *`params`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-param[$$Param$$] array__ | Params is a slice of parameters for a given collector + |  |
-|===
-
-
-[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectors"]
-==== Collectors
-
-
-
-Collectors holds the list of collectors to be executed as part of the release workflow along with the
-ServiceAccount to be used in the PipelineRun.
-
-
-
-.Appears In:
-****
-- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionspec[$$ReleasePlanAdmissionSpec$$]
-- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanspec[$$ReleasePlanSpec$$]
-****
-
-[cols="20a,50a,15a,15a", options="header"]
-|===
-| Field | Description | Default | Validation
-| *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectoritem[$$CollectorItem$$] array__ | Items is the list of Collectors to be executed as part of the release workflow + |  |
-| *`serviceAccountName`* __string__ | ServiceAccountName is the ServiceAccount to use during the execution of the Collectors Pipeline + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-|===
-
-
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplan"]
 ==== MatchedReleasePlan
 
@@ -119,28 +67,6 @@ MatchedReleasePlanAdmission defines the relevant information for a matched Relea
 | Field | Description | Default | Validation
 | *`name`* __string__ | Name contains the namespaced name of the releasePlanAdmission + |  |
 | *`active`* __boolean__ | Active indicates whether the ReleasePlanAdmission is set to auto-release or not + |  |
-|===
-
-
-[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-param"]
-==== Param
-
-
-
-Param represents a parameter for a collector
-
-
-
-.Appears In:
-****
-- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectoritem[$$CollectorItem$$]
-****
-
-[cols="20a,50a,15a,15a", options="header"]
-|===
-| Field | Description | Default | Validation
-| *`name`* __string__ | Name is the name of the parameter + |  |
-| *`value`* __string__ | Value is the value of the parameter + |  |
 |===
 
 
@@ -284,15 +210,15 @@ ReleasePlanAdmissionSpec defines the desired state of ReleasePlanAdmission.
 |===
 | Field | Description | Default | Validation
 | *`applications`* __string array__ | Applications is a list of references to applications to be released in the managed namespace + |  |
-| *`collectors`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectors[$$Collectors$$]__ | Collectors contains all the information of the collectors to be executed as part of the release workflow + |  |
-| *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the managed Release Pipeline + |  |
+| *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the release Pipeline + |  |
 | *`environment`* __string__ | Environment defines which Environment will be used to release the Application + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
 | *`origin`* __string__ | Origin references where the release requests should come from + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`pipeline`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipeline[$$Pipeline$$]__ | Pipeline contains all the information about the managed Pipeline + |  |
+| *`pipelineRef`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref[$$PipelineRef$$]__ | PipelineRef is a reference to the Pipeline to be executed by the release PipelineRun + |  |
 | *`policy`* __string__ | Policy to validate before releasing an artifact + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
+| *`serviceAccount`* __string__ | ServiceAccount is the name of the service account to use in the release PipelineRun to gain elevated privileges + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 |===
 
 
@@ -359,7 +285,6 @@ ReleasePlanSpec defines the desired state of ReleasePlan.
 | Field | Description | Default | Validation
 | *`application`* __string__ | Application is a reference to the application to be released in the managed namespace + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`collectors`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectors[$$Collectors$$]__ | Collectors contains all the information of the collectors to be executed as part of the release workflow + |  |
 | *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the managed Release Pipeline + |  |
 | *`tenantPipeline`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-parameterizedpipeline[$$ParameterizedPipeline$$]__ | TenantPipeline contains all the information about the tenant Pipeline + |  |
 | *`finalPipeline`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-parameterizedpipeline[$$ParameterizedPipeline$$]__ | FinalPipeline contains all the information about the final Pipeline + |  |
@@ -751,4 +676,39 @@ PipelineResourceLimits set CPU and memory constraints for release pipelines
 | Field | Description | Default | Validation
 | *`cpu`* __string__ | CPU limit for release pipeline execution + |  |
 | *`memory`* __string__ | Memory limit for release pipeline execution + |  |
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref"]
+==== PipelineRef
+
+PipelineRef is the reference to the Pipeline
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionspec[$$ReleasePlanAdmissionSpec$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`params`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-param[$$Param$$] array__ | Params is a slice of parameters for a given resolver + |  |
+| *`resolver`* __string__ | Resolver is the name of a Tekton resolver to be used (e.g. git) + |  |
+| *`timeout`* __string__ | Timeout is value to use to override the tekton default Pipelinerun timeout + | "0" |
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-param"]
+==== Param
+
+Param defines the parameters for a given resolver in PipelineRef
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref[$$PipelineRef$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`name`* __string__ | Name is the name of the parameter + |  |
+| *`value`* __string__ | Value is the value of the parameter + |  |
 |===
