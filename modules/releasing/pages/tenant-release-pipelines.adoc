@@ -192,18 +192,20 @@ kind: ReleasePlan
 spec:
   ...
   finalPipeline:
-    pipelineRef: <.>
-      resolver: git
-      params:
-        - name: url
-          value: "https://github.com/<your-github-user>/<your-pipeline-repo>.git"
-        - name: revision
-          value: main
-        - name: pathInRepo
-          value: "<path-to-your-pipeline>"
-    serviceAccountName: build-pipeline-$COMPONENT_NAME <.>
+    params:
+    - name: paramForPipeline
+      value: foo
+    resolver: git
+    params:
+      - name: url
+        value: "https://github.com/<your-github-user>/<your-pipeline-repo>.git"
+      - name: revision
+        value: main
+      - name: pathInRepo
+        value: "<path-to-your-pipeline>"
+    serviceAccount: build-pipeline-$COMPONENT_NAME <.>
 ----
-<.> Reference to the tenant pipeline to be executed in the development tenant namespace.
+<.> The parameters to pass to your pipeline. Note: the release-operator will automatically pass parameters `taskGitRevision` and `taskGitUrl` with the same values as the `pipelineRef` `revision` and `pipelineRef` `url` parameters respectively. So, you should not pass your own values for these two parameters in this section. If you do, tekton validation webhooks will block the pipelineRun creation.
 <.> The name of the service account used to execute the tenant pipeline.
 
 Both tenant and final pipelines receive the same parameters (i.e. release, releasePlan, and snapshot), allowing them to be used interchangeably. The key difference is that the final pipeline runs at the end of the release workflow, meaning the release status will contain the final outcome and all generated artifacts.
