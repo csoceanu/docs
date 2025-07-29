@@ -6,19 +6,16 @@ A ReleasePlan (RP) CR is created for a specific Application. It defines the the 
 
 The development team creates a `ReleasePlan` object in the developer tenant namespace. The `ReleasePlan` object includes a reference to the application that the development team wants to release, along with tenant namespace where the application is supposed to be released.
 
-.*Prerequisites*
-
+.Prerequisites
 * You have an existing Development tenant namespace.
 * You have completed the steps listed in the xref:ROOT:getting-started.adoc#getting-started-with-the-cli[Getting started in the CLI] page.
 
-.*Procedures*
+.Procedures
 
 . Create a `ReleasePlan.yaml` object locally.
 
 +
-*Example `ReleasePlan.yaml` object*
-
-+
+.Example `ReleasePlan.yaml` object
 [source,yaml]
 ----
 apiVersion: appstudio.redhat.com/v1alpha1
@@ -32,6 +29,13 @@ metadata:
  namespace: dev-tenant-namespace <.>
 spec:
  application: <application-name> <.>
+ pipelineRef:
+   params:
+   - name: release-pipeline-param
+     value: 'value'
+   resolver: 'git'
+   timeout: "2h"
+ serviceAccount: release-service-account
  target:
    namespace: managed-tenant-namespace <.>
    workspace: <workspace-name> <.>
@@ -54,7 +58,7 @@ spec:
 $ kubectl apply -f ReleasePlan.yaml -n dev
 ----
 
-.*Verification*
+.Verification
 
 . In the {ProductName} UI, select the *Release services* > *Release plan* tab.
 . Review the Release plan object that you just added. Using the Release plan tab, you can update or delete the selected Release plan object.

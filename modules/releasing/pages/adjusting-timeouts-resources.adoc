@@ -6,7 +6,7 @@ To overcome this, there are two strategies {ProductName} users can follow.
 
 == Adjust timeouts
 
-Whenever a pipeline is defined through the tenantPipeline/finalPipeline fields in the ReleasePlan or the pipelineRef field in the ReleasePlanAdmission, users can specify a `timeout` field in the following way:
+Whenever a pipeline is defined through the xref:release-service-reference.adoc#releaseplan_spec[pipelineRef field in the ReleasePlan] or the xref:release-service-reference.adoc#releaseplanadmission_spec[pipelineRef field in the ReleasePlanAdmission], users can specify a `timeout` field in the following way:
 
 [source,yaml]
 ----
@@ -22,7 +22,7 @@ pipelineRef:
   timeout: "2h0m0s" <.>
 ----
 
-<.> specifies the timeout for the entire PipelineRun. Defaults to the global configurable default timeout of 60 minutes.
+<.> Specifies the timeout for the entire PipelineRun. Defaults to the global configurable default timeout of 60 minutes.
 
 == Adjust resources
 

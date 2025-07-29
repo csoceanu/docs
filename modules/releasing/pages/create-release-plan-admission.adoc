@@ -25,19 +25,19 @@ When an application is ready for release, the Development team contacts the owne
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: ReleasePlanAdmission
 metadata:
- labels:
-   release.appstudio.openshift.io/auto-release: 'true' <.>
- name: sre-production <.>
- namespace: managed-tenant-namespace <.>
+  labels:
+    release.appstudio.openshift.io/auto-release: 'true' <.>
+  name: sre-production <.>
+  namespace: managed-tenant-namespace <.>
 spec:
- applications:
+  applications:
   - demo-app <.>
- data: <key> <.>
- environment: <sre-production> <.>
- origin: <dev-tenant-namespace> <.>
- pipelineRef: <pipeline_ref> <.>
- policy: <policy> <.>
- serviceAccount: <service-account> <.>
+  data: <key> <.>
+  environment: <sre-production> <.>
+  origin: <dev-tenant-namespace> <.>
+  pipelineRef: <pipeline_ref> <.>
+  policy: <policy> <.>
+  serviceAccount: <service-account> <.>
 ----
 
 +
