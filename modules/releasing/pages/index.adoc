@@ -27,4 +27,4 @@ Two teams work together to release an application:
 
 * *Create a `Release` object:* The development team creates a Release object to reference a specific Snapshot and ReleasePlan. It indicates the users' intent to operate on the Snapshot with the matched ReleasePlanAdmission.
 
-* *Configure `ReleaseServiceConfig`:* The Managed Environment team can configure a `ReleaseServiceConfig` to define security policies, notification settings, and resource limits for release operations.
+* *Configure `ReleaseServiceConfig`:* The Managed Environment team can configure a `ReleaseServiceConfig` to define security policies, advisory repository, notification settings, and resource limits for release operations.
