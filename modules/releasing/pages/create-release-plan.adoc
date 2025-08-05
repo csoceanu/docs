@@ -35,7 +35,7 @@ spec:
      value: 'value'
    resolver: 'git'
    timeout: "2h"
- serviceAccount: release-service-account
+ serviceAccount: release-service-account <.>
  target:
    namespace: managed-tenant-namespace <.>
    workspace: <workspace-name> <.>
@@ -47,6 +47,7 @@ spec:
 <.> The name of the release plan.
 <.> The development team's tenant namespace.
 <.> The name of the application that you want to deploy to the managed tenant namespace.
+<.> Optional: The service account to use when executing the Release pipeline.
 <.> The tenant namespace to which the system deploys the application. This tenant namespace is created by the Managed environment team (for example, your organization's SRE team).
 <.> Optional: The KCP workspace to which the system deploys the application. This workspace is created by the Managed environment team (for example, your organization's SRE team).
 

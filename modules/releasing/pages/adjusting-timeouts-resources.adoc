@@ -45,7 +45,6 @@ spec:
   data: <key>
   origin: <dev-tenant-namespace>
   pipelineRef:
-    resolver: git
     params:
       - name: url
         value: "<url-to-repo>.git"
@@ -53,8 +52,10 @@ spec:
         value: main
       - name: pathInRepo
         value: "<path-to-your-pipeline>"
-  serviceAccount: release-service-account <.>
+    resolver: git
+    timeout: "2h0m0s"
   policy: <policy>
+  serviceAccount: release-service-account <.>
 ----
 
 <.> Name of the Task we want to modify.

@@ -22,7 +22,6 @@ To use a tenant pipeline:
 +
 *Example `ReleasePlan.yaml` object*
 
-+
 [source,yaml]
 ----
 apiVersion: appstudio.redhat.com/v1alpha1
@@ -41,9 +40,6 @@ spec:
         - name: demo-component-1
           repository: registry/destination-image-repository-1
           tags: [latest]
-        - name: demo-component-2
-          repository: registry/destination-image-repository-2
-          tags: [latest]
   target: managed-tenant-namespace
   pipelineRef: <.>
     params: <.>
@@ -60,7 +56,6 @@ spec:
   serviceAccount: build-pipeline-$COMPONENT_NAME <.>
 ----
 
-+
 <.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.
 <.> The development team's tenant namespace.
 <.> The name of the application that you want to release via a pipeline in the development tenant namespace.
@@ -72,7 +67,6 @@ spec:
 . In case you want to avoid the execution of a managed pipeline, remove the `target` field from your `ReleasePlan.yaml` file.
 . In the Development tenant namespace, apply the `ReleasePlan.yaml` file and add the resource to your cluster by running the following command:
 
-+
 [source,shell]
 ----
 kubectl apply -f ReleasePlan.yaml -n dev
@@ -84,7 +78,6 @@ kubectl apply -f ReleasePlan.yaml -n dev
 +
 *Example `rbac.yaml` object*
 
-+
 [source,yaml]
 ----
 apiVersion: rbac.authorization.k8s.io/v1
@@ -119,7 +112,6 @@ subjects:
   namespace: dev-tenant-namespace <.>
 ----
 
-+
 <.> The name of the Role.
 <.> The development team's tenant namespace.
 <.> The name of the RoleBinding.
@@ -130,7 +122,6 @@ subjects:
 
 . In the Development tenant namespace, apply the `rbac.yaml` file and add the resources to your cluster by running the following command:
 
-+
 [source,shell]
 ----
 kubectl apply -f rbac.yaml -n dev-tenant-namespace
