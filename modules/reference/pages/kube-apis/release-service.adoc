@@ -42,9 +42,11 @@ MatchedReleasePlan defines the relevant information for a matched ReleasePlan.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`name`* __string__ | Name contains the namespaced name of the ReleasePlan + |  | Pattern: `^[a-z0-9]([-a-z0-9]\*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`name`* __string__ | Name contains the namespaced name of the ReleasePlan +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`active`* __boolean__ | Active indicates whether the ReleasePlan is set to auto-release or not + |  |
+| *`active`* __boolean__ | Active indicates whether the ReleasePlan is set to auto-release or not +
+|  |
 |===
 
 
@@ -65,8 +67,11 @@ MatchedReleasePlanAdmission defines the relevant information for a matched Relea
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`name`* __string__ | Name contains the namespaced name of the releasePlanAdmission + |  |
-| *`active`* __boolean__ | Active indicates whether the ReleasePlanAdmission is set to auto-release or not + |  |
+| *`name`* __string__ | Name contains the namespaced name of the releasePlanAdmission +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`active`* __boolean__ | Active indicates whether the ReleasePlanAdmission is set to auto-release or not +
+|  |
 |===
 
 
@@ -90,7 +95,7 @@ Release is the Schema for the releases API
 | *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |
 | *`kind`* __string__ | `Release` | |
 | *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#objectmeta-v1-meta[$$ObjectMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.
- |  |
+|  |
 | *`spec`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasespec[$$ReleaseSpec$$]__ |  |  |
 | *`status`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]__ |  |  |
 |===
@@ -113,7 +118,7 @@ ReleaseList contains a list of Release
 | *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |
 | *`kind`* __string__ | `ReleaseList` | |
 | *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#listmeta-v1-meta[$$ListMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.
- |  |
+|  |
 | *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-release[$$Release$$] array__ |  |  |
 |===
 
@@ -138,7 +143,7 @@ ReleasePlan is the Schema for the ReleasePlans API.
 | *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |
 | *`kind`* __string__ | `ReleasePlan` | |
 | *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#objectmeta-v1-meta[$$ObjectMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.
- |  |
+|  |
 | *`spec`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanspec[$$ReleasePlanSpec$$]__ |  |  |
 | *`status`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanstatus[$$ReleasePlanStatus$$]__ |  |  |
 |===
@@ -164,7 +169,7 @@ ReleasePlanAdmission is the Schema for the ReleasePlanAdmissions API.
 | *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |
 | *`kind`* __string__ | `ReleasePlanAdmission` | |
 | *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#objectmeta-v1-meta[$$ObjectMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.
- |  |
+|  |
 | *`spec`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionspec[$$ReleasePlanAdmissionSpec$$]__ |  |  |
 | *`status`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionstatus[$$ReleasePlanAdmissionStatus$$]__ |  |  |
 |===
@@ -187,7 +192,7 @@ ReleasePlanAdmissionList contains a list of ReleasePlanAdmission.
 | *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |
 | *`kind`* __string__ | `ReleasePlanAdmissionList` | |
 | *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#listmeta-v1-meta[$$ListMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.
- |  |
+|  |
 | *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmission[$$ReleasePlanAdmission$$] array__ |  |  |
 |===
 
@@ -209,16 +214,23 @@ ReleasePlanAdmissionSpec defines the desired state of ReleasePlanAdmission.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`applications`* __string array__ | Applications is a list of references to applications to be released in the managed namespace + |  |
-| *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the release Pipeline + |  |
-| *`environment`* __string__ | Environment defines which Environment will be used to release the Application + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`applications`* __string array__ | Applications is a list of references to applications to be released in the managed namespace +
+|  |
+| *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the release Pipeline +
+|  |
+| *`environment`* __string__ | Environment defines which Environment will be used to release the Application +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`origin`* __string__ | Origin references where the release requests should come from + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`origin`* __string__ | Origin references where the release requests should come from +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`pipelineRef`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref[$$PipelineRef$$]__ | PipelineRef is a reference to the Pipeline to be executed by the release PipelineRun + |  |
-| *`policy`* __string__ | Policy to validate before releasing an artifact + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`pipelineRef`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref[$$PipelineRef$$]__ | PipelineRef is a reference to the Pipeline to be executed by the release PipelineRun +
+|  |
+| *`policy`* __string__ | Policy to validate before releasing an artifact +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`serviceAccount`* __string__ | ServiceAccount is the name of the service account to use in the release PipelineRun to gain elevated privileges + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`serviceAccount`* __string__ | ServiceAccount is the name of the service account to use in the release PipelineRun to gain elevated privileges +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 |===
 
 
@@ -239,8 +251,10 @@ ReleasePlanAdmissionStatus defines the observed state of ReleasePlanAdmission.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the releasePlanAdmission + |  |
-| *`releasePlans`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplan[$$MatchedReleasePlan$$] array__ | ReleasePlan is a list of releasePlans matched to the ReleasePlanAdmission + |  |
+| *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the releasePlanAdmission +
+|  |
+| *`releasePlans`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplan[$$MatchedReleasePlan$$] array__ | ReleasePlan is a list of releasePlans matched to the ReleasePlanAdmission +
+|  |
 |===
 
 
@@ -261,7 +275,7 @@ ReleasePlanList contains a list of ReleasePlan.
 | *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |
 | *`kind`* __string__ | `ReleasePlanList` | |
 | *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#listmeta-v1-meta[$$ListMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.
- |  |
+|  |
 | *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplan[$$ReleasePlan$$] array__ |  |  |
 |===
 
@@ -283,15 +297,18 @@ ReleasePlanSpec defines the desired state of ReleasePlan.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`application`* __string__ | Application is a reference to the application to be released in the managed namespace + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`application`* __string__ | Application is a reference to the application to be released in the managed namespace +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the managed Release Pipeline + |  |
-| *`tenantPipeline`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-parameterizedpipeline[$$ParameterizedPipeline$$]__ | TenantPipeline contains all the information about the tenant Pipeline + |  |
-| *`finalPipeline`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-parameterizedpipeline[$$ParameterizedPipeline$$]__ | FinalPipeline contains all the information about the final Pipeline + |  |
-| *`releaseGracePeriodDays`* __integer__ | ReleaseGracePeriodDays is the number of days a Release should be kept +
-This value is used to define the Release ExpirationTime + | 7 |
-| *`target`* __string__ | Target references where to send the release requests + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the release Pipeline +
+|  |
+| *`pipelineRef`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref[$$PipelineRef$$]__ | PipelineRef is an optional reference to a Pipeline that would be executed before the release Pipeline +
+|  |
+| *`serviceAccount`* __string__ | ServiceAccount is the name of the service account to use in the Pipeline to gain elevated privileges +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
+| *`target`* __string__ | Target references where to send the release requests +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 |===
 
 
@@ -312,9 +329,11 @@ ReleasePlanStatus defines the observed state of ReleasePlan.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the releasePlan + |  |
+| *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the releasePlan +
+|  |
 | *`releasePlanAdmission`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplanadmission[$$MatchedReleasePlanAdmission$$]__ | ReleasePlanAdmission contains the information of the releasePlanAdmission this ReleasePlan is +
-matched to + |  |
+matched to +
+|  |
 |===
 
 
@@ -338,7 +357,7 @@ ReleaseServiceConfig is the Schema for the releaseserviceconfigs API
 | *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |
 | *`kind`* __string__ | `ReleaseServiceConfig` | |
 | *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#objectmeta-v1-meta[$$ObjectMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.
- |  |
+|  |
 | *`spec`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfigspec[$$ReleaseServiceConfigSpec$$]__ |  |  |
 | *`status`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfigstatus[$$ReleaseServiceConfigStatus$$]__ |  |  |
 |===
@@ -361,7 +380,7 @@ ReleaseServiceConfigList contains a list of ReleaseServiceConfig
 | *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |
 | *`kind`* __string__ | `ReleaseServiceConfigList` | |
 | *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#listmeta-v1-meta[$$ListMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.
- |  |
+|  |
 | *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfig[$$ReleaseServiceConfig$$] array__ |  |  |
 |===
 
@@ -383,14 +402,20 @@ ReleaseServiceConfigSpec defines the desired state of ReleaseServiceConfig.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`advisoryRepo`* __string__ | AdvisoryRepo is the repo to create advisories in during the managed release PipelineRun + |  |
+| *`advisoryRepo`* __string__ | AdvisoryRepo is the repo to create advisories in during the managed release PipelineRun +
+|  |
 | *`debug`* __boolean__ | Debug is the boolean that specifies whether or not the Release Service should run +
-in debug mode + |  |
+in debug mode +
+|  |
 | *`defaultTimeouts`* __xref:{anchor_prefix}-github-com-tektoncd-pipeline-pkg-apis-pipeline-v1-timeoutfields[$$TimeoutFields$$]__ | DefaultTimeouts contain the default Tekton timeouts to be used in case they are +
-not specified in the ReleasePlanAdmission resource. + |  |
-| *`notificationSettings`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-notificationsettings[$$NotificationSettings$$]__ | NotificationSettings configure how release notifications are sent to different stakeholders during the release process + |  |
-| *`resourceLimits`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-resourcelimits[$$ResourceLimits$$]__ | ResourceLimits define constraints on resource usage during release operations to prevent excessive consumption of cluster resources + |  |
-| *`securityPolicies`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-securitypolicies[$$SecurityPolicies$$]__ | SecurityPolicies define security requirements and constraints that must be enforced during the release process + |  |
+not specified in the ReleasePlanAdmission resource. +
+|  |
+| *`notificationSettings`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-notificationsettings[$$NotificationSettings$$]__ | NotificationSettings configure how release notifications are sent to different stakeholders during the release process +
+|  |
+| *`resourceLimits`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-resourcelimits[$$ResourceLimits$$]__ | ResourceLimits define constraints on resource usage during release operations to prevent excessive consumption of cluster resources +
+|  |
+| *`securityPolicies`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-securitypolicies[$$SecurityPolicies$$]__ | SecurityPolicies define security requirements and constraints that must be enforced during the release process +
+|  |
 |===
 
 
@@ -427,9 +452,11 @@ ReleaseSpec defines the desired state of Release.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`releasePlan`* __string__ | ReleasePlan to use for this particular Release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`releasePlan`* __string__ | ReleasePlan to use for this particular Release +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`snapshot`* __string__ | Snapshot to be released + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`snapshot`* __string__ | Snapshot to be released +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
 |===
 
@@ -451,23 +478,39 @@ ReleaseStatus defines the observed state of Release.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`automated`* __boolean__ | Automated indicates whether the Release was created as part of an automated process or manually by an end-user + |  |
-| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when a Release was completed + |  |
-| *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the release + |  |
-| *`expirationTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | ExpirationTime is the time when a Release can be purged + |  |
-| *`managedProcessing`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusmanagedprocessing[$$ReleaseStatusManagedProcessing$$]__ | ManagedProcessing contains information about the release managed processing + |  |
-| *`postActionsExecution`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatuspostactionsexecution[$$ReleaseStatusPostActionsExecution$$]__ | PostActionsExecution contains information about the post-actions execution + |  |
-| *`processing`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusprocessing[$$ReleaseStatusProcessing$$]__ | Processing contains information about the release processing + |  |
-| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when a Release was started + |  |
-| *`target`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-target[$$Target$$]__ | Target references where this relesae is intended to be released to + |  |
-| *`collectorsResults`* __object__ | CollectorsResults holds the collectors results generated by the Collectors Pipeline + |  |
+| *`automated`* __boolean__ | Automated indicates whether the Release was created as part of an automated process or manually by an end-user +
+|  |
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when a Release was completed +
+|  |
+| *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the release +
+|  |
+| *`deployment`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusdeployment[$$ReleaseStatusDeployment$$]__ | Deployment contains information about the deployment +
+|  |
+| *`postActionsExecution`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatuspostactionsexecution[$$ReleaseStatusPostActionsExecution$$]__ | PostActionsExecution contains information about the post-actions execution +
+|  |
+| *`processing`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusprocessing[$$ReleaseStatusProcessing$$]__ | Processing contains information about the release processing +
+|  |
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when a Release was started +
+|  |
+| *`target`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-target[$$Target$$]__ | Target references where this relesae is intended to be released to +
+|  |
+| *`attribution`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-attribution[$$Attribution$$]__ | Attribution contains information about the entity authorizing the release +
+|  |
+| *`audit`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-audit[$$Audit$$]__ | Audit contains information about the Release audit +
+|  |
+| *`collectorsResults`* __object__ | CollectorsResults holds the collectors results generated by the Collectors Pipeline +
+|  |
+| *`expirationTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | ExpirationTime is the time when a Release can be purged +
+|  |
+| *`validation`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusvalidation[$$ReleaseStatusValidation$$]__ | Validation contains information about the release validation +
+|  |
 |===
 
 
-[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusmanagedprocessing"]
-==== ReleaseStatusManagedProcessing
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusdeployment"]
+==== ReleaseStatusDeployment
 
-ManagedProcessing contains information about the release managed processing
+Deployment contains information about the deployment
 
 .Appears In:
 ****
@@ -477,12 +520,15 @@ ManagedProcessing contains information about the release managed processing
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release processing was completed + |  |
-| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release deployment was completed +
+|  |
+| *`environment`* __string__ | Environment is the environment where the Release will be deployed to +
+|  |
+| *`snapshotEnvironmentBinding`* __string__ | SnapshotEnvironmentBinding contains the namespaced name of the SnapshotEnvironmentBinding created as part of this release +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`roleBinding`* __string__ | RoleBinding contains the namespaced name of the roleBinding created for the managed Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release processing started + |  |
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release deployment started +
+|  |
 |===
 
 
@@ -499,12 +545,10 @@ PostActionsExecution contains information about the post-actions execution
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release processing was completed + |  |
-| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-| *`roleBinding`* __string__ | RoleBinding contains the namespaced name of the roleBinding created for the managed Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
-
-| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release processing started + |  |
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release post-actions execution was completed +
+|  |
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release post-actions execution started +
+|  |
 |===
 
 
@@ -521,12 +565,16 @@ Processing contains information about the release processing
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release processing was completed + |  |
-| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release processing was completed +
+|  |
+| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the release PipelineRun executed as part of this release +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`roleBinding`* __string__ | RoleBinding contains the namespaced name of the roleBinding created for the managed Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`roleBinding`* __string__ | RoleBinding contains the namespaced name of the roleBinding created for the Release PipelineRun executed as part of this release +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release processing started + |  |
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release processing started +
+|  |
 |===
 
 
@@ -547,9 +595,11 @@ Target references where this relesae is intended to be released to
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`namespace`* __string__ | Namespace references a namespace within the cluster + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+| *`namespace`* __string__ | Namespace references a namespace within the cluster +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
-| *`workspace`* __string__ | Workspace references a KCP workspace within the cluster + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])(:[a-z0-9]([-a-z0-9]*[a-z0-9]))*$` +
+| *`workspace`* __string__ | Workspace references a KCP workspace within the cluster +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])(:[a-z0-9]([-a-z0-9]*[a-z0-9]))*$` +
 
 |===
 
@@ -566,8 +616,10 @@ NotificationSettings configure how release notifications are sent to different s
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`email`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-emailnotificationsettings[$$EmailNotificationSettings$$]__ | Email notification configuration + |  |
-| *`slack`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-slacknotificationsettings[$$SlackNotificationSettings$$]__ | Slack notification configuration + |  |
+| *`email`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-emailnotificationsettings[$$EmailNotificationSettings$$]__ | Email notification configuration +
+|  |
+| *`slack`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-slacknotificationsettings[$$SlackNotificationSettings$$]__ | Slack notification configuration +
+|  |
 |===
 
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-emailnotificationsettings"]
@@ -583,10 +635,14 @@ Email notification configuration
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`enabled`* __boolean__ | Enabled determines if email notifications are active + |  |
-| *`onFailure`* __boolean__ | OnFailure sends notifications when releases fail + |  |
-| *`onSuccess`* __boolean__ | OnSuccess sends notifications when releases succeed + |  |
-| *`recipients`* __string array__ | Recipients is a list of email addresses to notify + |  |
+| *`enabled`* __boolean__ | Enabled determines if email notifications are active +
+|  |
+| *`onFailure`* __boolean__ | OnFailure sends notifications when releases fail +
+|  |
+| *`onSuccess`* __boolean__ | OnSuccess sends notifications when releases succeed +
+|  |
+| *`recipients`* __string array__ | Recipients is a list of email addresses to notify +
+|  |
 |===
 
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-slacknotificationsettings"]
@@ -602,9 +658,12 @@ Slack notification configuration
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`channel`* __string__ | Channel specifies the Slack channel to notify + |  |
-| *`enabled`* __boolean__ | Enabled determines if Slack notifications are active + |  |
-| *`webhookURL`* __string__ | WebhookURL is the Slack webhook URL for notifications + |  |
+| *`channel`* __string__ | Channel specifies the Slack channel to notify +
+|  |
+| *`enabled`* __boolean__ | Enabled determines if Slack notifications are active +
+|  |
+| *`webhookURL`* __string__ | WebhookURL is the Slack webhook URL for notifications +
+|  |
 |===
 
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-securitypolicies"]
@@ -620,9 +679,12 @@ SecurityPolicies define security requirements and constraints that must be enfor
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`allowedRegistries`* __string array__ | AllowedRegistries is a list of container registries that releases can target + |  |
-| *`requireCodeSigning`* __boolean__ | RequireCodeSigning enforces that all artifacts must be digitally signed + |  |
-| *`vulnerabilityScanning`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-vulnerabilityscanning[$$VulnerabilityScanning$$]__ | VulnerabilityScanning configuration for security checks + |  |
+| *`allowedRegistries`* __string array__ | AllowedRegistries is a list of container registries that releases can target +
+|  |
+| *`requireCodeSigning`* __boolean__ | RequireCodeSigning enforces that all artifacts must be digitally signed +
+|  |
+| *`vulnerabilityScanning`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-vulnerabilityscanning[$$VulnerabilityScanning$$]__ | VulnerabilityScanning configuration for security checks +
+|  |
 |===
 
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-vulnerabilityscanning"]
@@ -638,9 +700,12 @@ VulnerabilityScanning configuration for security checks
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`enabled`* __boolean__ | Enabled determines if vulnerability scanning is required + |  |
-| *`maxCriticalVulnerabilities`* __integer__ | MaxCriticalVulnerabilities sets the maximum allowed critical CVEs + |  |
-| *`maxHighVulnerabilities`* __integer__ | MaxHighVulnerabilities sets the maximum allowed high-severity CVEs + |  |
+| *`enabled`* __boolean__ | Enabled determines if vulnerability scanning is required +
+|  |
+| *`maxCriticalVulnerabilities`* __integer__ | MaxCriticalVulnerabilities sets the maximum allowed critical CVEs +
+|  |
+| *`maxHighVulnerabilities`* __integer__ | MaxHighVulnerabilities sets the maximum allowed high-severity CVEs +
+|  |
 |===
 
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-resourcelimits"]
@@ -656,9 +721,12 @@ ResourceLimits define constraints on resource usage during release operations to
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`maxConcurrentReleases`* __integer__ | MaxConcurrentReleases limits how many releases can run simultaneously + |  |
-| *`pipelineResourceLimits`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelineresourcelimits[$$PipelineResourceLimits$$]__ | PipelineResourceLimits set CPU and memory constraints for release pipelines + |  |
-| *`timeoutGracePeriod`* __string__ | TimeoutGracePeriod defines how long to wait before forcefully terminating stuck releases + |  |
+| *`maxConcurrentReleases`* __integer__ | MaxConcurrentReleases limits how many releases can run simultaneously +
+|  |
+| *`pipelineResourceLimits`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelineresourcelimits[$$PipelineResourceLimits$$]__ | PipelineResourceLimits set CPU and memory constraints for release pipelines +
+|  |
+| *`timeoutGracePeriod`* __string__ | TimeoutGracePeriod defines how long to wait before forcefully terminating stuck releases +
+|  |
 |===
 
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelineresourcelimits"]
@@ -674,8 +742,70 @@ PipelineResourceLimits set CPU and memory constraints for release pipelines
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`cpu`* __string__ | CPU limit for release pipeline execution + |  |
-| *`memory`* __string__ | Memory limit for release pipeline execution + |  |
+| *`cpu`* __string__ | CPU limit for release pipeline execution +
+|  |
+| *`memory`* __string__ | Memory limit for release pipeline execution +
+|  |
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-attribution"]
+==== Attribution
+
+Attribution contains information about the entity authorizing the release
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`author`* __string__ | Author of the release (e.g. user ID or automated system) +
+|  |
+| *`organization`* __string__ | Organization initiating the release (e.g. a team or department) +
+|  |
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-audit"]
+==== Audit
+
+Audit contains information about the Release audit
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`reviewUrl`* __string__ | ReviewUrl points to the review link in a system (e.g. Jira, GitHub, Gitlab) +
+|  |
+| *`signatories`* __string array__ | Signatories are the entities that have reviewed and signed off on the Release +
+|  |
+|===
+
+[id="{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatusvalidation"]
+==== ReleaseStatusValidation
+
+Validation contains information about the release validation
+
+.Appears In:
+****
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]
+****
+
+[cols="20a,50a,15a,15a", options="header"]
+|===
+| Field | Description | Default | Validation
+| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release validation was completed +
+|  |
+| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the Release validation PipelineRun executed as part of this release +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release validation started +
+|  |
 |===
 
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref"]
@@ -691,9 +821,12 @@ PipelineRef is the reference to the Pipeline
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`params`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-param[$$Param$$] array__ | Params is a slice of parameters for a given resolver + |  |
-| *`resolver`* __string__ | Resolver is the name of a Tekton resolver to be used (e.g. git) + |  |
-| *`timeout`* __string__ | Timeout is value to use to override the tekton default Pipelinerun timeout + | "0" |
+| *`params`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-param[$$Param$$] array__ | Params is a slice of parameters for a given resolver +
+|  |
+| *`resolver`* __string__ | Resolver is the name of a Tekton resolver to be used (e.g. git) +
+|  |
+| *`timeout`* __string__ | Timeout is value to use to override the tekton default Pipelinerun timeout +
+| "0" |
 |===
 
 [id="{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-param"]
@@ -709,6 +842,8 @@ Param defines the parameters for a given resolver in PipelineRef
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`name`* __string__ | Name is the name of the parameter + |  |
-| *`value`* __string__ | Value is the value of the parameter + |  |
+| *`name`* __string__ | Name is the name of the parameter +
+|  |
+| *`value`* __string__ | Value is the value of the parameter +
+|  |
 |===
