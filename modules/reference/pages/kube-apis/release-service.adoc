@@ -816,6 +816,7 @@ PipelineRef is the reference to the Pipeline
 .Appears In:
 ****
 - xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionspec[$$ReleasePlanAdmissionSpec$$]
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanspec[$$ReleasePlanSpec$$]
 ****
 
 [cols="20a,50a,15a,15a", options="header"]
