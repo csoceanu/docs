@@ -42,7 +42,6 @@ metadata:
 spec:
   applications:
     - demo-app
-  data: <key>
   origin: <dev-tenant-namespace>
   pipelineRef:
     params:

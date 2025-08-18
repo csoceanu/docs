@@ -3,7 +3,7 @@
 The usual release process in {ProductName} involves two different teams: a *Development team* and a *Managed environment team* as described in
 xref:releasing:index.adoc[Releasing an application]. The development team is usually the one who develops and support the application while the managed team will control the process and the secrets. Although this is a powerful workflow, in some cases it might feel very limiting. For example, sometimes the Development team wants to release their software to some destination that is directly under their control, using their own secrets, without depending on a Managed environment team. Another example would be performing actions before running the managed pipeline such as cleaning up old images or notifying about an ongoing release. The way {ProductName} supports these scenarios is by using something we call a *tenant release pipeline*. It's a release pipeline that runs in the tenant namespace of the Development team, rather than in that of the Managed environment team.
 
-The gist here is that this workflow doesn't require a managed pipeline. You can omit the `target` and just specify the `tenant pipeline` you want to run. But, if both tenant and managed pipelines are provided, the tenant pipeline needs to succeed before continuing with the release of the application.
+The gist here is that this workflow doesn't require a managed pipeline. You can omit the `target` and just specify the `pipelineRef` you want to run. But, if both tenant and managed pipelines are provided, the tenant pipeline needs to succeed before continuing with the release of the application.
 
 == Using a tenant pipeline ==
 

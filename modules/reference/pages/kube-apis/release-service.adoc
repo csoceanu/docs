@@ -128,7 +128,7 @@ ReleaseList contains a list of Release
 
 
 
-ReleasePlan is the Schema for the ReleasePlans API.
+ReleasePlan is the Schema for the ReleasePlans API. This resource defines release configurations for applications.
 
 
 
@@ -331,8 +331,7 @@ ReleasePlanStatus defines the observed state of ReleasePlan.
 | Field | Description | Default | Validation
 | *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the releasePlan +
 |  |
-| *`releasePlanAdmission`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplanadmission[$$MatchedReleasePlanAdmission$$]__ | ReleasePlanAdmission contains the information of the releasePlanAdmission this ReleasePlan is +
-matched to +
+| *`releasePlanAdmission`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplanadmission[$$MatchedReleasePlanAdmission$$]__ | ReleasePlanAdmission contains the information of the releasePlanAdmission this ReleasePlan is matched to +
 |  |
 |===
 

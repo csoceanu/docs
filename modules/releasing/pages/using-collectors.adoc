@@ -31,31 +31,27 @@ metadata:
   namespace: dev-tenant-namespace <.>
 spec:
   application: <application-name> <.>
-  collectors:
-    serviceAccountName: collector-service
-    items: <.>
-      - name: project-issues
-        params:
-          - name: url
-            value: https://issues.redhat.com
-          - name: query
-            value: 'project = "My Project" AND summary ~ "test issue"'
-          - name: secretName
-            value: "jira-collectors-secret"
-        timeout: 60
-        type: jira <.>
-    secrets: <.>
-      - jira-collectors-secret
   data: <key> <.>
+  pipelineRef:
+    params:
+      - name: url
+        value: https://issues.redhat.com
+      - name: query
+        value: 'project = "My Project" AND summary ~ "test issue"'
+      - name: secretName
+        value: "jira-collectors-secret"
+    resolver: jira <.>
+    timeout: "60s" <.>
+  serviceAccount: collector-service <.>
   target: managed-tenant-namespace
 ----
 <.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.
 <.> The development team's tenant namespace. The collector pipeline will be executed in this namespace.
 <.> The name of the application that you want to release via a pipeline in the development tenant namespace.
-<.> List of parameters to be passed to the collector.
-<.> The collector type as seen in the official collectors repository.
-<.> Secrets to be provided to the collectors.
 <.> Optional: An unstructured key used for providing data for the managed Pipeline.
+<.> The collector type as seen in the official collectors repository.
+<.> Optional: Timeout for the pipeline. Defaults to 0 (no timeout).
+<.> ServiceAccount to use in the Pipeline to gain elevated privileges.
 
 == Retrieving collectors data
 

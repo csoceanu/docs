@@ -25,6 +25,7 @@ When an application is ready for release, the Development team contacts the owne
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: ReleasePlanAdmission
 metadata:
+  creationTimestamp: null
   labels:
     release.appstudio.openshift.io/auto-release: 'true' <.>
   name: sre-production <.>
@@ -41,6 +42,12 @@ spec:
     timeout: <timeout> <.>
   policy: <policy> <.>
   serviceAccount: <service-account> <.>
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
 ----
 
 +
