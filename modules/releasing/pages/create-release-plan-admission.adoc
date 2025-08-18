@@ -33,7 +33,6 @@ metadata:
 spec:
   applications:
   - demo-app <.>
-  data: <key> <.>
   environment: <sre-production> <.>
   origin: <dev-tenant-namespace> <.>
   pipelineRef:
@@ -55,7 +54,6 @@ status:
 <.> The name of the release plan admission.
 <.> The Managed environment team's tenant namespace.
 <.> A list of applications that you want to enable to be deployed in the managed tenant namespace.
-<.> Optional: An unstructured key used for providing data for the release Pipeline.
 <.> Optional: The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
 <.> The development team tenant namespace where the application is defined.
 <.> Parameters for the referenced pipeline.

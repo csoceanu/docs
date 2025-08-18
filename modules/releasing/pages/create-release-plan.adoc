@@ -29,12 +29,8 @@ metadata:
  namespace: dev-tenant-namespace <.>
 spec:
  application: <application-name> <.>
- pipelineRef:
-   params:
-   - name: release-pipeline-param
-     value: 'value'
-   resolver: 'git'
-   timeout: "2h"
+ displayName: 'SRE Production Release' <.>
+ releaseStrategy: immediate <.>
  serviceAccount: release-service-account <.>
  target:
    namespace: managed-tenant-namespace <.>
@@ -47,6 +43,8 @@ spec:
 <.> The name of the release plan.
 <.> The development team's tenant namespace.
 <.> The name of the application that you want to deploy to the managed tenant namespace.
+<.> The display name of the ReleasePlan.
+<.> The release strategy to use for this ReleasePlan. Valid values are `rolling`, `blue-green`, `canary`, or `immediate`.
 <.> Optional: The service account to use when executing the Release pipeline.
 <.> The tenant namespace to which the system deploys the application. This tenant namespace is created by the Managed environment team (for example, your organization's SRE team).
 <.> Optional: The KCP workspace to which the system deploys the application. This workspace is created by the Managed environment team (for example, your organization's SRE team).
