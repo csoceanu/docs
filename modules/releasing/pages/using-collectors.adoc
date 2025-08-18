@@ -1,23 +1,19 @@
-= Collectors
+= Release Pipelines
 
 The release process with {ProductName} is well-structured, and the documentation provides clear examples of how to supply data to the `Release`, `ReleasePlan`, or `ReleasePlanAdmission` resources for use within the release workflow.
 
-Despite this, a limitation remains that prevents full workflow automation. In scenarios where a data field in one of the release resources needs to be populated with dynamic information retrieved from an external service _before_ initiating the release, relying on manual steps or custom scripts introduces inefficiency and potential for error.
+To address a previous limitation where data fields needed to be populated with dynamic information, {ProductName} now supports release pipelines. Release pipelines are responsible for running the tasks required to validate, collect, and release information. These pipelines are integrated into the release workflow and run at the very beginning, immediately after the validation step. As a result, the collected data becomes available to both the _tenant_ and _managed_ pipelines.
 
-To address this limitation, {ProductName} includes a feature called *collectors*.
+== Using release pipelines in a {ProductName} release
 
-A _collector_ is essentially a Python script executed as part of the _tenant_ and _managed collectors pipelines_. It generates information that is embedded into the `Release` status. These pipelines are integrated into the release workflow and run at the very beginning, immediately after the validation step. As a result, the collected data becomes available to both the _tenant_ and _managed_ pipelines.
+To use a release pipeline, the first step is to select one from the available options in https://github.com/konflux-ci/release-service-catalog/tree/main/pipelines[the official repository]. The structure of this repository may evolve over time, but the https://github.com/konflux-ci/release-service-catalog/blob/main/pipelines/README.md[README.md] file provides useful details about the available pipelines and the data they produce. The key piece of information needed is the pipeline's name, which will be referenced in one of the release resources.
 
-== Using a collector in a {ProductName} release
+Release pipelines can be defined in the following resources:
 
-To use a collector, the first step is to select one from the available options in https://github.com/konflux-ci/release-service-collectors[the official repository]. The structure of this repository may evolve over time, but the https://github.com/konflux-ci/release-service-collectors/blob/main/README.md[README.md] file provides useful details about the available collectors and the data they produce. The key piece of information needed is the collector's name, which will be referenced in one of the release resources.
+* *ReleasePlan:* Pipelines defined here are executed by the _tenant pipeline_, which runs in the tenant namespace.
+* *ReleasePlanAdmission:* Pipelines defined here are executed by the _managed pipeline_, which runs in the managed namespace.
 
-Collectors can be defined in the following resources:
-
-* *ReleasePlan:* Collectors defined here are executed by the _tenant collectors pipeline_, which runs in the tenant namespace.
-* *ReleasePlanAdmission:* Collectors defined here are executed by the _managed collectors pipeline_, which runs in the managed namespace.
-
-For example, to run the `jira` collector—which retrieves a list of Jira issues when provided with a server and a query—the following configuration should be added to the _ReleasePlan_:
+For example, to run the `release` pipeline—which retrieves a list of Jira issues when provided with a server and a query—the following configuration should be added to the _ReleasePlan_:
 
 [source,yaml]
 ----
@@ -52,9 +48,9 @@ spec:
 <.> The pipelineRef field replaces the previous collectors field and points to the pipeline to be executed to collect data.
 <.> The release strategy to be applied, e.g., `rolling`, `blue-green`, `canary`, or `immediate`.
 
-== Retrieving collectors data
+== Retrieving Release Pipeline data
 
-After the collectors pipelines complete execution, the output from each collector is added to the `Release` resource under the `status.collectors` field. Below is an example showing the result of a collector defined in the previously mentioned _ReleasePlan_:
+After the release pipelines complete execution, the output from each pipeline is added to the `Release` resource under the `status.release` field. Below is an example showing the result of a pipeline defined in the previously mentioned _ReleasePlan_:
 
 [source,yaml]
 ----
@@ -62,7 +58,7 @@ apiVersion: appstudio.redhat.com/v1alpha1
 kind: Release
 ...
 status:
-  collectors:
+  release:
     tenant:
       - project-issues:
           releaseNotes:
@@ -71,9 +67,9 @@ status:
                source: "issues.redhat.com"
 ----
 
-In this case, the `project-issues` collector generated a list of issues, which is included under `status.collectors.tenant`. Since this collector was defined in the `ReleasePlan`, its output is categorized under the `tenant` section. Collectors defined in a `ReleasePlanAdmission` will have their results stored under the `managed` key instead.
+In this case, the `project-issues` pipeline generated a list of issues, which is included under `status.release.tenant`. Since this pipeline was defined in the `ReleasePlan`, its output is categorized under the `tenant` section. Pipelines defined in a `ReleasePlanAdmission` will have their results stored under the `managed` key instead.
 
-The following example shows a `Release` status containing results from multiple collectors, both _tenant_ and _managed_:
+The following example shows a `Release` status containing results from multiple pipelines, both _tenant_ and _managed_:
 
 [source,yaml]
 ----
@@ -81,7 +77,7 @@ apiVersion: appstudio.redhat.com/v1alpha1
 kind: Release
 ...
 status:
-  collectors:
+  release:
     managed:
       - foo:
           releaseNotes:
@@ -99,18 +95,18 @@ status:
                   source: "issues.redhat.com"
 ----
 
-## Collectors in the managed pipeline
+## Release data in the managed pipeline
 
-Releases can reference _managed pipelines_, which—as described in other sections—rely on the `data` field to retrieve user-provided information. To ensure that data generated by _collectors_ is also considered, the contents of `status.collectors` are merged with the data fields from the `Release`, `ReleasePlan`, and `ReleasePlanAdmission` resources.
+Releases can reference _managed pipelines_, which—as described in other sections—rely on the `data` field to retrieve user-provided information. To ensure that data generated by _pipelines_ is also considered, the contents of `status.release` are merged with the data fields from the `Release`, `ReleasePlan`, and `ReleasePlanAdmission` resources.
 
-The order of precedence follows the same hierarchy previously described, with `status.collectors` having the *lowest priority*. This means that if both the collector output and any data field define the same key, the value from the `data` field will take precedence.
+The order of precedence follows the same hierarchy previously described, with `status.release` having the *lowest priority*. This means that if both the pipeline output and any data field define the same key, the value from the `data` field will take precedence.
 
-For example, if a collector like `jira` produces the following output:
+For example, if a pipeline like `jira` produces the following output:
 
 [source,yaml]
 ----
 status:
-  collectors:
+  release:
     tenant:
       - project-issues:
           releaseNotes:
@@ -134,7 +130,7 @@ data:
       fixed: []
 ----
 
-Then the empty `issues.fixed` array from the `data` field will override the collector’s output.
+Then the empty `issues.fixed` array from the `data` field will override the pipeline’s output.
 
 In contrast, if the `data` field contains unrelated content:
 
