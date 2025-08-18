@@ -32,6 +32,16 @@ metadata:
 spec:
   application: <application-name> <.>
   displayName: "My Release Plan" <.>
+  pipelineRef: <.>
+    params:
+      - name: SCRIPT_FILENAME
+        value: collect-jira-issues
+      - name: JIRA_SERVER
+        value: https://issues.redhat.com
+      - name: JIRA_QUERY
+        value: project = CPAAS AND labels = release AND fixVersion in ("2.0.0", "2.1.0")
+    resolver: git
+    timeout: 30s
   releaseStrategy: rolling <.>
   target: managed-tenant-namespace
 ----
@@ -39,6 +49,7 @@ spec:
 <.> The development team's tenant namespace. The collector pipeline will be executed in this namespace.
 <.> The name of the application that you want to release via a pipeline in the development tenant namespace.
 <.> The user-friendly name of the ReleasePlan.
+<.> The pipelineRef field replaces the previous collectors field and points to the pipeline to be executed to collect data.
 <.> The release strategy to be applied, e.g., `rolling`, `blue-green`, `canary`, or `immediate`.
 
 == Retrieving collectors data

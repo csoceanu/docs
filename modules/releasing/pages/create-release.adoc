@@ -32,6 +32,9 @@ metadata:
 spec:
   releasePlan: <release-plan-name> <.>
   snapshot: <application-snapshot-name> <.>
+  environment: <target-environment> <.>
+  gracePeriodSeconds: <grace-period> <.>
+  rollbackEnabled: <rollback-enabled> <.>
 ----
 
 +
@@ -39,6 +42,9 @@ spec:
 <.> The development team's tenant namespace.
 <.> The name of the release plan specifying the pipeline to run.
 <.> The name of the application snapshot that you want to release.
+<.> The target deployment environment (e.g., `development`, `staging`, `production`, `testing`).
+<.> The grace period in seconds for release shutdown operations.
+<.> Set to `true` to enable automatic rollback for this release, `false` otherwise.
 
 . In the development tenant namespace, apply the `Release.yaml` file and add the resource to your cluster by running the following command:
 
