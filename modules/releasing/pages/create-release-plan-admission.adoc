@@ -33,7 +33,11 @@ metadata:
 spec:
   applications:
   - demo-app <.>
+  approvalMode: <approval-mode> <.>
+  autoRelease: <auto-release> <.>
+  data: {} <.>
   environment: <sre-production> <.>
+  notificationConfig: <notification-config> <.>
   origin: <dev-tenant-namespace> <.>
   pipelineRef:
     params: <params> <.>
@@ -54,7 +58,11 @@ status:
 <.> The name of the release plan admission.
 <.> The Managed environment team's tenant namespace.
 <.> A list of applications that you want to enable to be deployed in the managed tenant namespace.
+<.> Defines the approval process for releases. Possible values are `manual`, `automatic`, or `policy-based`.
+<.> Optional: When set to `true`, enables automatic release creation when conditions are met.
+<.> Optional: Unstructured key for providing data for the release Pipeline.
 <.> Optional: The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
+<.> Optional: Defines notification settings for release events. It has subfields: `channels` (list of notification channels like `slack`, `email`) and `events` (list of events like `release-started`, `release-completed`, `release-failed`, `approval-required`).
 <.> The development team tenant namespace where the application is defined.
 <.> Parameters for the referenced pipeline.
 <.> Name of a Tekton resolver to be used (for example, `git`).

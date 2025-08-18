@@ -45,7 +45,7 @@ spec:
 <.> Optional: Information about a Pipeline to be executed before the release Pipeline.
 <.> Optional: The service account to use when executing the Release pipeline.
 <.> The tenant namespace to which the system deploys the application. This tenant namespace is created by the Managed environment team (for example, your organization's SRE team).
-<.> Optional: The KCP workspace to which the system deploys the application. This workspace is created by the Managed environment team (for example, your organization's SRE team).
+<.> Optional: The KCP workspace to which the system deplys the application. This workspace is created by the Managed environment team (for example, your organization's SRE team).
 
 . In the development tenant namespace, apply the `ReleasePlan.yaml` file and add the resource to your cluster by running the following command:
 
@@ -58,4 +58,4 @@ $ kubectl apply -f ReleasePlan.yaml -n dev
 
 . In the {ProductName} UI, select the *Release services* > *Release plan* tab.
 . Review the Release plan object that you just added. Using the Release plan tab, you can update or delete the selected Release plan object.
-. When a ReleasePlan is correctly configured to be paired with a ReleasePlanAdmission, its *Status* will display as being `Matched`.
+. When a ReleasePlan is correctly configured to be paired with a ReleasePlanAdmission, its Status will display as being `Matched`.
