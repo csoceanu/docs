@@ -424,7 +424,7 @@ not specified in the ReleasePlanAdmission resource. +
 | *`resourceLimits`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-resourcelimits[$$ResourceLimits$$]__ | ResourceLimits define constraints on resource usage during release operations to prevent excessive consumption of cluster resources +
 |  |
 | *`retryAttempts`* __integer__ | RetryAttempts specifies the maximum number of retry attempts for failed pipeline runs +
-|  | Minimum: 0, Maximum: 10
+| `0` | Minimum: 0, Maximum: 10
 | *`securityPolicies`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-securitypolicies[$$SecurityPolicies$$]__ | SecurityPolicies define security requirements and constraints that must be enforced during the release process +
 |  |
 |===
