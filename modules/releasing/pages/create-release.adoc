@@ -8,13 +8,13 @@ The development team creates a `Release` object in the developer tenant namespac
 
 . The `Release` object can also contain additional data or specify a custom timeout for the release pipeline.
 
-.*Prerequisites*
+*Prerequisites*
 
 * You have an existing Development tenant namespace.
 * You have completed the steps listed in the xref:ROOT:getting-started.adoc#getting-started-with-the-cli[Getting started in the CLI] page.
 * You have completed the steps for creating a ReleasePlanAdmission and a matching ReleasePlan.
 
-.*Procedures*
+*Procedures*
 
 . Create a `Release.yaml` object locally.
 
@@ -54,7 +54,7 @@ spec:
 $ kubectl apply -f Release.yaml -n dev
 ----
 
-.*Verification*
+*Verification*
 
 . In the {ProductName} UI, select the *Applications* tab
 . Click on the application that is being released

@@ -259,7 +259,7 @@ ReleasePlanAdmissionStatus defines the observed state of ReleasePlanAdmission.
 | Field | Description | Default | Validation
 | *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the releasePlanAdmission +
 |  |
-| *`phase`* __string__ | Phase represents the current phase of the ReleasePlanAdmission (e.g., Active, Pending, Disabled, Error) +
+| *`phase`* __string__ | Phase represents the current phase of the ReleasePlanAdmission (e.g., Active, Pending, Disabled, Error, Validating) +
 |  |
 | *`releasePlans`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplan[$$MatchedReleasePlan$$] array__ | ReleasePlan is a list of releasePlans matched to the ReleasePlanAdmission +
 |  |
@@ -349,7 +349,7 @@ ReleasePlanStatus defines the observed state of ReleasePlan.
 
 
 
-ReleaseServiceConfig is the Schema for the releaseserviceconfigs API
+ReleaseServiceConfig is the Schema for the releaseserviceconfigs API. This resource manages global configuration settings for the release service.
 
 
 
@@ -416,6 +416,8 @@ in debug mode +
 |  |
 | *`defaultTimeouts`* __xref:{anchor_prefix}-github-com-tektoncd-pipeline-pkg-apis-pipeline-v1-timeoutfields[$$TimeoutFields$$]__ | DefaultTimeouts contain the default Tekton timeouts to be used in case they are +
 not specified in the ReleasePlanAdmission resource. +
+|  |
+| *`logLevel`* __string__ | LogLevel defines the logging verbosity level for the release service +
 |  |
 | *`notificationSettings`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-notificationsettings[$$NotificationSettings$$]__ | NotificationSettings configure how release notifications are sent to different stakeholders during the release process +
 |  |
@@ -506,7 +508,7 @@ ReleaseStatus defines the observed state of Release.
 |  |
 | *`expirationTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | ExpirationTime is the time when a Release can be purged +
 |  |
-| *`phase`* __string__ | Phase represents the current phase of the Release lifecycle (e.g., Preparing, InProgress, Completed, Failed, RolledBack) +
+| *`phase`* __string__ | Phase represents the current phase of the Release lifecycle (e.g., Preparing, InProgress, Completed, Failed, RolledBack, Cancelled) +
 |  |
 | *`postActionsExecution`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatuspostactionsexecution[$$ReleaseStatusPostActionsExecution$$]__ | PostActionsExecution contains information about the post-actions execution +
 |  |

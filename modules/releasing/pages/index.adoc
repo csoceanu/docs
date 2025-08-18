@@ -13,7 +13,7 @@ Two teams work together to release an application:
 
 .Procedure
 
-. When an application is ready for release, the Development team contacts the Managed Environment team (for example, their organization's SRE team) requesting access to the managed environment for the first production release. 
+. When an application is ready for release, the Development team contacts the Managed Environment team (for example, their organization's SRE team) requesting access to the managed environment for the first production release.
 
 . The development and managed environment teams will work together to create a ReleasePlanAdmission (RPA) in the managed environment to specify the release pipeline to run containing the appropriate tasks to release the application.
 
