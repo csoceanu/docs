@@ -42,6 +42,7 @@ metadata:
 spec:
   applications:
     - demo-app
+  approvalMode: manual
   origin: <dev-tenant-namespace>
   pipelineRef:
     params:

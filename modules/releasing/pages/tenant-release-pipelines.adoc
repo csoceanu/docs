@@ -171,7 +171,7 @@ Another type of tenant pipeline runs at the end of the release workflow. This is
 
 You can use this pipeline, for example, to send Slack notifications once your images have been pushed or to generate a changelog summarizing the new changes.
 
-To enable it, modify the ReleasePlan by adding the `finalPipeline` field.
+To enable it, modify the ReleasePlan by adding the `pipelineRef` field in `finalPipeline`.
 
 *Example of final pipeline declaration*
 

@@ -7,3 +7,5 @@
 *** xref:notification-configuration.adoc[Configuring release notifications]
 *** xref:security-policy-enforcement.adoc[Enforcing security policies]
 *** xref:resource-limitations.adoc[Setting resource limitations]
+*** xref:release-rollback.adoc[Rolling back a release]
+*** xref:automatic-releases.adoc[Enabling automatic releases]
