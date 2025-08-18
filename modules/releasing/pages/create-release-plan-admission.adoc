@@ -58,7 +58,7 @@ status:
 <.> The development team tenant namespace where the application is defined.
 <.> Parameters for the referenced pipeline.
 <.> Name of a Tekton resolver to be used (for example, `git`).
-<.> Optional: Timeout value to override the Tekton default PipelineRun timeout. Defaults to 0, which means no timeout.
+<.> Optional: Timeout value to override the Tekton default PipelineRun timeout. Defaults to "0", which means no timeout.
 <.> The enterprise contract policy against which the system validates an application before releasing it to production.
 <.> Optional: The name of the service account to use in the release PipelineRun to gain elevated privileges. It's used only if you have defined the `pipelineRef` value.
 
