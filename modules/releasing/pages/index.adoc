@@ -21,10 +21,10 @@ Two teams work together to release an application:
 
 .Next steps
 
-* *Create a `ReleasePlan` object:* The development team creates a ReleasePlan object in the developer tenant namespace. The ReleasePlan object includes a reference to the application that the development team wants to release, along with tenant namespace where the application is supposed to be released.
+* *Create a `ReleasePlan` object:* The development team creates a xref:creating-releaseplan.adoc[`ReleasePlan`] object in the developer tenant namespace. The ReleasePlan object includes a reference to the application that the development team wants to release, along with tenant namespace where the application is supposed to be released.
 
-* *Create a `ReleasePlanAdmission` object:* The Managed Environment team creates or updates the ReleasePlanAdmission object in response to the ReleasePlan object created by the development team. It indicates that the Managed Environment team has approved the application specified in the ReleasePlan object.
+* *Create a `ReleasePlanAdmission` object:* The Managed Environment team creates or updates the xref:creating-releaseplanadmission.adoc[`ReleasePlanAdmission`] object in response to the ReleasePlan object created by the development team. It indicates that the Managed Environment team has approved the application specified in the ReleasePlan object.
 
-* *Create a `Release` object:* The development team creates a Release object to reference a specific Snapshot and ReleasePlan. It indicates the users' intent to operate on the Snapshot with the matched ReleasePlanAdmission.
+* *Create a `Release` object:* The development team creates a xref:creating-release.adoc[`Release`] object to reference a specific Snapshot and ReleasePlan. It indicates the users' intent to operate on the Snapshot with the matched ReleasePlanAdmission.
 
-* *Configure `ReleaseServiceConfig`:* The Managed Environment team can configure a `ReleaseServiceConfig` to define security policies, advisory repository, notification settings, and resource limits for release operations.
+* *Configure `ReleaseServiceConfig`:* The Managed Environment team can configure a xref:configuring-releaseserviceconfig.adoc[`ReleaseServiceConfig`] to define security policies, advisory repository, notification settings, and resource limits for release operations.

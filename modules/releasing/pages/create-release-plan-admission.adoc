@@ -85,4 +85,4 @@ kubectl apply -f ReleasePlanAdmission.yaml -n managed
 
 . In the {ProductName} UI, select the *Release services* > *Release plan admission* tab.
 . Review the RPA object that you just added. Using the Release plan admission tab, you can update or delete the selected Release plan admission object.
-. When a ReleasePlanAdmission is correctly configured to be paired with a ReleasePlan, its *Status* will display as being `Matched`.
+. When a ReleasePlanAdmission is correctly configured to be paired with a ReleasePlan, its *Status* will display as being `Active`.
