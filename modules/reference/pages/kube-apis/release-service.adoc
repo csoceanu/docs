@@ -127,7 +127,7 @@ ReleasePlanAdmissionSpec defines the desired state of ReleasePlanAdmission.
 
 | *`pipelineRef`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref[$$PipelineRef$$]__ | PipelineRef is a reference to the Pipeline to be executed by the release PipelineRun +
 |  |
-| *`policy`* __string__ | Policy to validate before releasing an artifact +
+| *`policy`* __string__ | Policy to validate before releasing an.artifact +
 |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
 | *`serviceAccount`* __string__ | ServiceAccount is the name of the service account to use in the release PipelineRun to gain elevated privileges +
