@@ -193,7 +193,7 @@ ReleasePlanSpec defines the desired state of ReleasePlan.
 |  |
 | *`pipelineRef`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref[$$PipelineRef$$]__ | PipelineRef is an optional reference to a Pipeline that would be executed before the release Pipeline +
 |  |
-| *`serviceAccount`* __string__ | ServiceAccount is the name of the service account to use in the Pipeline to gain elevated privileges +
+| *`serviceAccount`* __string__ | ServiceAccount is the name of the service account to use in the current Pipeline to gain elevated privileges +
 |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 
 | *`target`* __string__ | Target references where to send the release requests +
