@@ -4,7 +4,7 @@ A Release CR is created to submit a specific Application Snapshot to be processe
 
 == Creating a `Release` object
 
-The development team creates a `Release` object in the developer tenant namespace. The `Release` object includes a reference to the application snapshot that the development team wants to release, along with release plan that will be used to release the application.
+The development team creates a `Release` object in the developer tenant namespace. The `Release` object includes a reference to the application component snapshot that the development team wants to release, along with release plan that will be used to release the application.
 
 . The `Release` object can also contain additional data or specify a custom timeout for the release pipeline.
 
@@ -32,9 +32,8 @@ metadata:
 spec:
   releasePlan: <release-plan-name> <.>
   snapshot: <application-snapshot-name> <.>
-  environment: <target-environment> <.>
-  gracePeriodSeconds: <grace-period> <.>
-  rollbackEnabled: <rollback-enabled> <.>
+  data: <release-pipeline-data> <.>
+  gracePeriodDays: <grace-period-days> <.>
 ----
 
 +
@@ -42,9 +41,8 @@ spec:
 <.> The development team's tenant namespace.
 <.> The name of the release plan specifying the pipeline to run.
 <.> The name of the application snapshot that you want to release.
-<.> The target deployment environment (e.g., `development`, `staging`, `production`, `testing`).
-<.> The grace period in seconds for release shutdown operations.
-<.> Set to `true` to enable automatic rollback for this release, `false` otherwise.
+<.> An unstructured key used for providing data for the managed Release Pipeline.
+<.> The number of days a Release should be kept after completion. This value is used to define the Release ExpirationTime for cleanup purposes.
 
 . In the development tenant namespace, apply the `Release.yaml` file and add the resource to your cluster by running the following command:
 

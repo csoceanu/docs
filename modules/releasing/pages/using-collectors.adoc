@@ -43,7 +43,7 @@ spec:
 ----
 <.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.
 <.> The development team's tenant namespace. The collector pipeline will be executed in this namespace.
-<.> The name of the application that you want to release via a pipeline in the development tenant namespace.
+<.> The name of the application *component* that you want to release via a pipeline in the development tenant namespace.
 <.> The user-friendly name of the ReleasePlan.
 <.> The pipelineRef field replaces the previous collectors field and points to the pipeline to be executed to collect data.
 <.> The release strategy to be applied, e.g., `rolling`, `blue-green`, `canary`, or `immediate`.
