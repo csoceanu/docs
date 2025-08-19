@@ -55,7 +55,7 @@ $ kubectl apply -f Release.yaml -n dev
 *Verification*
 
 . In the {ProductName} UI, select the *Applications* tab
-. Click on the application that is being released
+. Click on the application component that is being released
 . Click on the *Releases* tab
 . See the recent releases that have been created for the application.
 . You can find a link to the release pipeline run by clicking on the name of the release that you created.
