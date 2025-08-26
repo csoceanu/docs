@@ -11,3 +11,4 @@
 *** xref:automatic-releases.adoc[Enabling automatic releases]
 *** xref:release-artifact-collection.adoc[Collecting release artifacts]
 *** xref:release-expiration.adoc[Configuring release expiration]
+*** xref:release-collectors.adoc[Configuring release collectors]

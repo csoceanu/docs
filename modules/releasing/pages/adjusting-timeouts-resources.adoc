@@ -79,6 +79,15 @@ spec:
           value: "<path-to-your-pipeline>"
       resolver: git
     serviceAccountName: release-service-account <.>
+    taskRunSpecs:
+      - pipelineTaskName: verify-enterprise-contract
+        computeResources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 2Gi
     timeouts:
       pipeline: "2h0m0s"
   policy: <policy>

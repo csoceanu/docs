@@ -230,6 +230,7 @@ The Release object's `status` fields have been updated with `artifacts`, `collec
 . The `finalProcessing` field contains information about the release final processing.
 . The `managedProcessing` field contains information about the release managed processing.
 . The `tenantProcessing` field contains information about the release tenant processing.
+. The `target` field is a string that references where the Release is targeted to.
 
 == Next steps ==
 

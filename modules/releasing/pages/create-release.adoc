@@ -56,3 +56,5 @@ $ kubectl create -f Release.yaml
 *Verification*
 
 . In the {ProductName} UI, select the *Applications* tab
+
+IMPORTANT: The `Release` object now includes an optional `data` field to provide unstructured data for the release pipeline and a `gracePeriodDays` field to define the release expiration time. The fields related to approval mode, auto-release, environment, notification config, and pipelineRef under `spec` have been removed or refactored. The `status` field has also been significantly updated to include detailed information about `artifacts`, `collectors`, `collectorsProcessing`, `expirationTime`, `finalProcessing`, `managedProcessing`, and `tenantProcessing`, replacing the simpler `phase` and `deployment` fields.
