@@ -41,25 +41,27 @@ spec:
           repository: registry/destination-image-repository-1
           tags: [latest]
   target: managed-tenant-namespace
-  pipelineRef: <.>
-    params: <.>
-    - name: paramForPipeline
-      value: foo
-    resolver: git
-    params:
-      - name: url
-        value: "https://github.com/<your-github-user>/<your-pipeline-repo>.git"
-      - name: revision
-        value: main
-      - name: pathInRepo
-        value: "<path-to-your-pipeline>"
-  serviceAccount: build-pipeline-$COMPONENT_NAME <.>
+  pipeline: <.>
+    pipelineRef: <.>
+      params: <.>
+      - name: paramForPipeline
+        value: foo
+      resolver: git
+      params:
+        - name: url
+          value: "https://github.com/<your-github-user>/<your-pipeline-repo>.git"
+        - name: revision
+          value: main
+        - name: pathInRepo
+          value: "<path-to-your-pipeline>"
+    serviceAccountName: build-pipeline-$COMPONENT_NAME <.>
 ----
 
 <.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.
 <.> The development team's tenant namespace.
 <.> The name of the application that you want to release via a pipeline in the development tenant namespace.
 <.> A list containing the destination repository for each component
+<.> Defines the managed pipeline and its execution details.
 <.> Reference to the tenant pipeline to be executed in the development tenant namespace.
 <.> The parameters to pass to your pipeline. Note: the release-operator will automatically pass parameters `taskGitRevision` and `taskGitUrl` with the same values as the `pipelineRef` `revision` and `pipelineRef` `url` parameters respectively. So, you should not pass your own values for these two parameters in this section. If you do, tekton validation webhooks will block the pipelineRun creation.
 <.> The name of the service account used to execute the tenant pipeline.
@@ -182,20 +184,29 @@ kind: ReleasePlan
 ...
 spec:
   ...
-  finalPipeline:
-    params:
-    - name: paramForPipeline
-      value: foo
-    resolver: git
-    params:
-      - name: url
-        value: "https://github.com/<your-github-user>/<your-pipeline-repo>.git"
-      - name: revision
-        value: main
-      - name: pathInRepo
-        value: "<path-to-your-pipeline>"
-    serviceAccount: build-pipeline-$COMPONENT_NAME <.>
+  pipeline:
+    ...
+    timeouts: <.>
+      pipeline: 1h0m0s
+    ...
+  finalPipeline: <.>
+    pipelineRef: <.>
+      params: <.>
+      - name: paramForPipeline
+        value: foo
+      resolver: git
+      params:
+        - name: url
+          value: "https://github.com/<your-github-user>/<your-pipeline-repo>.git"
+        - name: revision
+          value: main
+        - name: pathInRepo
+          value: "<path-to-your-pipeline>"
+    serviceAccountName: build-pipeline-$COMPONENT_NAME <.>
 ----
+<.> Defines timeouts for the different stages of the Release PipelineRun execution.
+<.> Defines the final pipeline and its execution details.
+<.> Reference to the final pipeline to be executed in the development tenant namespace.
 <.> The parameters to pass to your pipeline. Note: the release-operator will automatically pass parameters `taskGitRevision` and `taskGitUrl` with the same values as the `pipelineRef` `revision` and `pipelineRef` `url` parameters respectively. So, you should not pass your own values for these two parameters in this section. If you do, tekton validation webhooks will block the pipelineRun creation.
 <.> The name of the service account used to execute the tenant pipeline.
 
@@ -203,20 +214,21 @@ Both tenant and final pipelines receive the same parameters (i.e. release, relea
 
 == Release object `spec` fields ==
 
-The Release object's `spec` fields have been updated to reflect the new `data` field and `gracePeriodDays` field, while removing `environment`, `rollbackEnabled`, and `phase`.
+The Release object's `spec` fields have been updated to reflect the new `data` field and `gracePeriodDays` field, while removing `environment` and `rollbackEnabled`.
 
 . The `data` field is an unstructured key used for providing data for the managed Release Pipeline.
 . The `gracePeriodDays` field is the number of days a Release should be kept after completion. This value is used to define the Release ExpirationTime for cleanup purposes.
 
 == Release object `status` fields ==
 
-The Release object's `status` fields have been updated with `artifacts`, `expirationTime`, `managedProcessing`, `postActionsExecution`, `processing`, and `tenantProcessing` fields, while removing `deployment`. Note that `collectors` and `collectorsProcessing` were removed, and `finalProcessing` renamed to `postActionsExecution`. The `processing` field refers to the *tenant* pipeline processing.
+The Release object's `status` fields have been updated with `artifacts`, `collectors`, `collectorsProcessing`, `expirationTime`, `finalProcessing`, `managedProcessing`, and `tenantProcessing` fields, while removing `deployment`, `phase`, `postActionsExecution`, and `processing`.
 
 . The `artifacts` field is an unstructured key used for storing all the artifacts generated by the managed Release Pipeline.
+. The `collectors` field is an unstructured key used for storing all the collectors results generated by the Collectors Pipeline.
+. The `collectorsProcessing` field contains information about the release collectors processing.
 . The `expirationTime` field is the time when a Release can be purged.
+. The `finalProcessing` field contains information about the release final processing.
 . The `managedProcessing` field contains information about the release managed processing.
-. The `postActionsExecution` field contains information about the post-actions execution. This field was previously `finalProcessing`.
-. The `processing` field contains information about the tenant release processing.
 . The `tenantProcessing` field contains information about the release tenant processing.
 
 == Next steps ==

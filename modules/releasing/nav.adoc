@@ -9,3 +9,5 @@
 *** xref:resource-limitations.adoc[Setting resource limitations]
 *** xref:release-rollback.adoc[Rolling back a release]
 *** xref:automatic-releases.adoc[Enabling automatic releases]
+*** xref:release-artifact-collection.adoc[Collecting release artifacts]
+*** xref:release-expiration.adoc[Configuring release expiration]

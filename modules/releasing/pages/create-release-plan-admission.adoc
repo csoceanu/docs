@@ -35,6 +35,7 @@ spec:
       - name: <param-name> <.>
         value: <param-value> <.>
       type: <collector-type> <.>
+      timeout: <collector-timeout> <.>
     serviceAccountName: <collector-service-account> <.>
   data: {} <.>
   environment: <sre-production> <.>
@@ -49,12 +50,6 @@ spec:
       pipeline: <pipeline-timeout> <.>
       tasks: <tasks-timeout> <.>
   policy: <policy> <.>
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
 ----
 
 +
@@ -66,6 +61,7 @@ status:
 <.> The name of the parameter.
 <.> The value of the parameter.
 <.> The type of collector to be used.
+<.> Timeout in seconds for the collector to execute.
 <.> The service account to use during the execution of the Collectors Pipeline.
 <.> Optional: Unstructured key for providing data for the managed Release Pipeline.
 <.> The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
