@@ -87,7 +87,7 @@ Let's say you're preparing for an upcoming 1.3.0 release.
 ----
 ❯ yq -i '.metadata.name = "your-project-1-3-0-rc01"' releases/1.3.0/snapshot.yaml
 # Confirm the name is as you expect
-❯ yq .metadata.name releases/1.3.0/snapshot.yaml                                 
+❯ yq .metadata.name releases/1.3.0/snapshot.yaml
 your-project-1-3-0-rc01
 ----
 

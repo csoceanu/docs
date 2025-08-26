@@ -41,7 +41,7 @@ spec:
 <.> The name of the release plan.
 <.> The development team's tenant namespace.
 <.> The name of the application component that you want to deploy to the managed tenant namespace.
-<.> Optional: Unstructured key used for providing data for the release Pipeline.
+<.> Optional: Unstructured key used for providing data for the managed Release Pipeline.
 <.> Optional: Information about a Pipeline to be executed before the release Pipeline.
 <.> Optional: The service account to use in the current Pipeline to gain elevated privileges.
 <.> The tenant namespace to which the system deploys the application. This tenant namespace is created by the Managed environment team (for example, your organization's SRE team).

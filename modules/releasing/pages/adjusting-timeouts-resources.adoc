@@ -24,6 +24,31 @@ pipelineRef:
 
 <.> Specifies the timeout for the entire PipelineRun. Defaults to the global configurable default timeout of 60 minutes.
 
+With the new API, the `timeout` field in `ReleasePlanAdmission` has been moved and expanded into `pipeline.timeouts` to allow for more granular control over task and finally timeouts.
+
+[source,yaml]
+----
+spec:
+  pipeline:
+    pipelineRef:
+      params:
+        - name: url
+          value: "<url-to-repo>.git"
+        - name: revision
+          value: main
+        - name: pathInRepo
+          value: "<path-to-your-pipeline>"
+      resolver: git
+    serviceAccountName: release-service-account
+    timeouts:
+      finally: "15m0s" <.>
+      pipeline: "2h0m0s" <.>
+      tasks: "1h30m0s" <.>
+----
+<.> Specifies the maximum allowed duration for the `finally` section of the pipeline.
+<.> Specifies the maximum allowed duration for the execution of the entire pipeline. The sum of individual timeouts for tasks and finally must not exceed this value.
+<.> Specifies the maximum allowed duration for the pipeline's tasks.
+
 == Adjust resources
 
 As can be seen in the section above, there's no way to specify timeouts for individual tasks. However, another field can be used to increase the resources an specific task can use during its execution.
@@ -42,20 +67,21 @@ metadata:
 spec:
   applications:
     - demo-app
-  approvalMode: manual
   origin: <dev-tenant-namespace>
-  pipelineRef:
-    params:
-      - name: url
-        value: "<url-to-repo>.git"
-      - name: revision
-        value: main
-      - name: pathInRepo
-        value: "<path-to-your-pipeline>"
-    resolver: git
-    timeout: "2h0m0s"
+  pipeline:
+    pipelineRef:
+      params:
+        - name: url
+          value: "<url-to-repo>.git"
+        - name: revision
+          value: main
+        - name: pathInRepo
+          value: "<path-to-your-pipeline>"
+      resolver: git
+    serviceAccountName: release-service-account <.>
+    timeouts:
+      pipeline: "2h0m0s"
   policy: <policy>
-  serviceAccount: release-service-account <.>
 ----
 
-<.> Name of the Task we want to modify.
+<.> Name of the service account to use in the Release PipelineRun to gain elevated privileges. This field has been moved from the top-level `spec` to `spec.pipeline`.

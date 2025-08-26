@@ -33,18 +33,27 @@ metadata:
 spec:
   applications:
   - demo-app <.>
-  approvalMode: <approval-mode> <.>
-  autoRelease: <auto-release> <.>
+  collectors: <.>
+    items: <.>
+    - name: <collector-name> <.>
+      params: <.>
+      - name: <param-name> <.>
+        value: <param-value> <.>
+      type: <collector-type> <.>
+    serviceAccountName: <collector-service-account> <.>
   data: {} <.>
   environment: <sre-production> <.>
-  notificationConfig: <notification-config> <.>
   origin: <dev-tenant-namespace> <.>
-  pipelineRef:
-    params: <params> <.>
-    resolver: <resolver> <.>
-    timeout: <timeout> <.>
+  pipeline: <.>
+    pipelineRef: <.>
+      params: <params> <.>
+      resolver: <resolver> <.>
+    serviceAccountName: <pipeline-service-account> <.>
+    timeouts: <.>
+      finally: <finally-timeout> <.>
+      pipeline: <pipeline-timeout> <.>
+      tasks: <tasks-timeout> <.>
   policy: <policy> <.>
-  serviceAccount: <service-account> <.>
 status:
   acceptedNames:
     kind: ""
@@ -58,17 +67,27 @@ status:
 <.> The name of the release plan admission.
 <.> The Managed environment team's tenant namespace.
 <.> A list of applications that you want to enable to be deployed in the managed tenant namespace.
-<.> Defines the approval process for releases. Possible values are `manual`, `automatic`, or `policy-based`.
-<.> Optional: When set to `true`, enables automatic release creation when conditions are met.
-<.> Optional: Unstructured key for providing data for the release Pipeline.
+<.> Contains all the information of the collectors to be executed as part of the release workflow.
+<.> The list of collectors to be executed as part of the release workflow.
+<.> The name of the collector.
+<.> A slice of parameters for a given collector.
+<.> The name of the parameter.
+<.> The value of the parameter.
+<.> The type of collector to be used.
+<.> The service account to use during the execution of the Collectors Pipeline.
+<.> Optional: Unstructured key for providing data for the managed Release Pipeline.
 <.> Optional: The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
-<.> Optional: Defines notification settings for release events. It has subfields: `channels` (list of notification channels like `slack`, `email`) and `events` (list of events like `release-started`, `release-completed`, `release-failed`, `approval-required`).
 <.> The development team tenant namespace where the application is defined.
+<.> Contains all the information about the managed Pipeline.
+<.> The reference to the Pipeline.
 <.> Parameters for the referenced pipeline.
 <.> Name of a Tekton resolver to be used (for example, `git`).
-<.> Optional: Timeout value to override the Tekton default PipelineRun timeout. Defaults to "0", which means no timeout.
+<.> The service account to use during the execution of the Pipeline.
+<.> Defines the different timeouts to use in the PipelineRun execution.
+<.> Sets the maximum allowed duration of this pipeline's `finally` tasks.
+<.> Sets the maximum allowed duration for execution of the entire pipeline. The sum of individual timeouts for tasks and finally must not exceed this value.
+<.> Sets the maximum allowed duration of this pipeline's tasks.
 <.> The enterprise contract policy against which the system validates an application before releasing it to production.
-<.> Optional: The name of the service account to use in the release PipelineRun to gain elevated privileges. It's used only if you have defined the `pipelineRef` value.
 
 +
 NOTE: The ReleasePlanAdmission.yaml represents the reciprocal link to the ReleasePlan.yaml objects created by the development team.
