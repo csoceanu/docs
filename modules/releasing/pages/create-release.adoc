@@ -1,6 +1,8 @@
 = Creating a release
 
-A Release CR is created to submit a specific Application Snapshot to be processed according to the referenced ReleasePlan.
+A `Release` object informs Konflux that an Application's
+xref:testing:page$integration/snapshots/index.adoc[Snapshot] is ready to be released, in accordiance
+with its associated xref:create-release-plan.adoc[ReleasePlan].
 
 == Creating a `Release` object
 
@@ -19,43 +21,36 @@ The development team creates a `Release` object in the developer tenant namespac
 . Create a `Release.yaml` object locally.
 
 +
-*Example `Release.yaml` object*
+include::releasing:partial$example-manual-release.adoc[]
 
-+
-[source,yaml]
-----
-apiVersion: appstudio.redhat.com/v1alpha1
-kind: Release
-metadata:
-  name: <name-of-this-release> <.>
-  namespace: dev-tenant-namespace <.>
-spec:
-  releasePlan: <release-plan-name> <.>
-  snapshot: <application-snapshot-name> <.>
-  data: <release-pipeline-data> <.>
-  gracePeriodDays: <grace-period-days> <.>
-----
-
-+
-<.> The name of the release.
-<.> The development team's tenant namespace.
-<.> The name of the release plan specifying the pipeline to run.
-<.> The name of the application snapshot that you want to release.
-<.> An unstructured key used for providing data for the managed Release Pipeline.
-<.> The number of days a Release should be kept after completion. This value is used to define the Release ExpirationTime for cleanup purposes.
-
-. In the development tenant namespace, apply the `Release.yaml` file and add the resource to your cluster by running the following command:
-
+. In the development tenant namespace, create the `Release` object using the `kubectl` command line:
 +
 [source,shell]
 ----
-$ kubectl apply -f Release.yaml -n dev
+
+. Remove the following fields from the `Release.yaml` object:
+.. `metadata` fields:
+... `annotations`
+... `creationTimestamp`
+... `finalizers`
+... `generation`
+... `name`
+... `ownerReferences`
+... `resourceVersion`
+... `uid`
+.. `status` - remove entirely or set its value to `{}`
+
+. Verify that the `Release.yaml` object is valid:
++
+include::releasing:partial$example-manual-release.adoc[]
+
+. Create the new `Release` object using the data in `Release.yaml`:
++
+[source,shell]
+----
+$ kubectl create -f Release.yaml
 ----
 
 *Verification*
 
 . In the {ProductName} UI, select the *Applications* tab
-. Click on the application component that is being released
-. Click on the *Releases* tab
-. See the recent releases that have been created for the application.
-. You can find a link to the release pipeline run by clicking on the name of the release that you created.

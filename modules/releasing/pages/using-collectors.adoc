@@ -27,18 +27,6 @@ metadata:
   namespace: dev-tenant-namespace <.>
 spec:
   application: <application-name> <.>
-  displayName: "My Release Plan" <.>
-  pipelineRef: <.>
-    params:
-      - name: SCRIPT_FILENAME
-        value: collect-jira-issues
-      - name: JIRA_SERVER
-        value: https://issues.redhat.com
-      - name: JIRA_QUERY
-        value: project = CPAAS AND labels = release AND fixVersion in ("2.0.0", "2.1.0")
-    resolver: git
-    timeout: 30s
-  releaseStrategy: rolling <.>
   target: managed-tenant-namespace
 ----
 <.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.
