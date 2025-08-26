@@ -182,6 +182,15 @@ CollectorsPipeline.
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
+| *`name`* __string__ | Name of the collector +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
+
+| *`params`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-param[$$Param$$] array__ | Params is a slice of parameters for a given collector +
+|  |
+| *`timeout`* __integer__ | Timeout in seconds for the collector to execute +
+|  |
+| *`type`* __string__ | Type is the type of collector to be used +
+|  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +
 |===
 
 
@@ -243,7 +252,7 @@ PipelineRef is the reference to the Pipeline
 [cols="20a,50a,15a,15a", options="header"]
 |===
 | Field | Description | Default | Validation
-| *`params`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-param[$$Param$$] array__ | Params is a slice of parameters for a given resolver +
+| *`params`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-paramindefiningpipelineref[$$ParamInDefiningPipelineRef$$] array__ | Params is a slice of parameters for a given resolver +
 |  |
 | *`resolver`* __string__ | Resolver is the name of a Tekton resolver to be used (e.g. git) +
 |  |

@@ -27,6 +27,8 @@ include::releasing:partial$example-manual-release.adoc[]
 +
 [source,shell]
 ----
+$ kubectl create -f Release.yaml
+----
 
 . Remove the following fields from the `Release.yaml` object:
 .. `metadata` fields:

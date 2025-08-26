@@ -58,9 +58,6 @@ status:
 ----
 
 +
-<.> Optional: Control whether or not this ReleasePlanAdmission is entirely disabled. If set to true, attempted releases will fail with a validation error. Defaults to false.
-<.> The name of the release plan admission.
-<.> The Managed environment team's tenant namespace.
 <.> A list of applications that you want to enable to be deployed in the managed tenant namespace.
 <.> Contains all the information of the collectors to be executed as part of the release workflow.
 <.> The list of collectors to be executed as part of the release workflow.
@@ -71,7 +68,7 @@ status:
 <.> The type of collector to be used.
 <.> The service account to use during the execution of the Collectors Pipeline.
 <.> Optional: Unstructured key for providing data for the managed Release Pipeline.
-<.> Optional: The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
+<.> The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
 <.> The development team tenant namespace where the application is defined.
 <.> Contains all the information about the managed Pipeline.
 <.> The reference to the Pipeline.

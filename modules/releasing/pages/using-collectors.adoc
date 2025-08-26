@@ -18,7 +18,7 @@ For example, to run the `release` pipeline—which retrieves a list of Jira issu
 [source,yaml]
 ----
 apiVersion: appstudio.redhat.com/v1alpha1
-kind: ReleasePlan
+kind: ReleasePlanAdmission
 metadata:
   labels:
     release.appstudio.openshift.io/auto-release: 'true' <.>
@@ -26,8 +26,20 @@ metadata:
   name: collectors-rp
   namespace: dev-tenant-namespace <.>
 spec:
-  application: <application-name> <.>
-  target: managed-tenant-namespace
+  applications: <application-name> <.>
+  origin: managed-tenant-namespace
+  policy: <policy-name>
+  pipeline:
+    pipelineRef:
+      params:
+        - name: collector-param-name
+          value: collector-param-value
+      resolver: git
+    serviceAccountName: release-service-account
+    timeouts:
+      pipeline: 1h0m0s
+      tasks: 30m0s
+      finally: 5m0s
 ----
 <.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.
 <.> The development team's tenant namespace. The collector pipeline will be executed in this namespace.
