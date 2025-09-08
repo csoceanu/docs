@@ -39,7 +39,7 @@ This **ConfigMap** can contain references to any Tekton pipeline bundles. Additi
 In order to support different use cases within {ProductName}, multiple Tekton pipeline bundles are available in the `quay.io/konflux-ci` organization.
 
 NOTE: The tasks included in the pipeline definitions can be discovered using `yq` or `jq`. For example,
-```bash
+----
 $ tkn bundle list -o yaml quay.io/konflux-ci/tekton-catalog/pipeline-docker-build:devel pipeline docker-build 2>/dev/null | yq ".spec.tasks.[].name"
 init
 clone-repository
@@ -54,7 +54,7 @@ sast-snyk-check
 clamav-scan
 apply-tags
 push-dockerfile
-```
+----
 
 ==== _docker-build_ [[docker-build]]
 

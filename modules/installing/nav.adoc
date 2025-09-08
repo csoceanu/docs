@@ -2,3 +2,4 @@
 *** xref:index.adoc[Installing {ProductName}]
 *** xref:enabling-builds.adoc[Enabling build pipelines]
 *** xref:github-app.adoc[GitHub App]
+*** xref:docs-automation.adoc[Documentation Automation]

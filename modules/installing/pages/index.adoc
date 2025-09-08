@@ -9,3 +9,5 @@ Before tapping into the vast array of benefits offered by {ProductName}, the ini
 . *Using Kubernetes manifests*: This option supports any image registry and involves fewer initial setup steps.
 
 For detailed instructions, refer to the link:https://github.com/konflux-ci/konflux-ci/blob/main/README.md[installation guide].
+
+Additionally, {ProductName} now includes enhanced documentation automation. This feature automatically updates documentation based on code changes by commenting `[update-docs]` on a Pull Request. This ensures that the documentation always reflects the latest state of the codebase, improving accuracy and reducing manual effort.

@@ -24,6 +24,9 @@ metadata:
    release.appstudio.openshift.io/auto-release: 'true' <.>
    release.appstudio.openshift.io/standing-attribution: 'true'
    release.appstudio.openshift.io/releasePlanAdmission: 'rpa-name' <.>
+   app.kubernetes.io/name: build-service <.>
+   app.kubernetes.io/component: controller <.>
+   monitoring: enabled <.>
  name: sre-production <.>
  namespace: dev-tenant-namespace <.>
 spec:
@@ -40,6 +43,9 @@ spec:
 
 <.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.
 <.> Optional: The name of the RPA to use if more than one RPA references the specified application.
+<.> Standardized label for resource identification.
+<.> Standardized label for identifying the component within the application.
+<.> Label to enable monitoring for the resource.
 <.> The name of the release plan.
 <.> The development team's tenant namespace.
 <.> The name of the application component that you want to deploy to the managed tenant namespace.
