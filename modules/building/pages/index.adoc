@@ -2,7 +2,7 @@
 
 When creating a component, {ProductName} will push a Tekton PipelineRun to your component's source repository. This pipeline is yours to customize as needed for building your component and Tekton Chains will record the customizations in a detailed signed in-toto provenance attestation. This provenance enables Conforma to xref:compliance:index.adoc[manage compliance] to ensure the artifact's integrity and compliance with specific policies.
 
-== Auto-Update Documentation
+== Automated Documentation Updates
 
 {ProductName} leverages an automated documentation update mechanism that responds to specific comments on Pull Requests. This system uses the `docs-enhancer.yml` workflow to automatically update documentation whenever a pull request comment contains `[update-docs]`.
 

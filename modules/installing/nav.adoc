@@ -3,3 +3,4 @@
 *** xref:enabling-builds.adoc[Enabling build pipelines]
 *** xref:github-app.adoc[GitHub App]
 *** xref:docs-automation.adoc[Documentation Automation]
+*** xref:kustomization-config.adoc[Kustomization Configuration]
