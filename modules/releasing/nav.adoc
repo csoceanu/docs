@@ -12,3 +12,4 @@
 *** xref:release-artifact-collection.adoc[Collecting release artifacts]
 *** xref:release-expiration.adoc[Configuring release expiration]
 *** xref:release-collectors.adoc[Configuring release collectors]
+*** xref:ci-cd-pipelines.adoc[Managing CI/CD Pipelines]
