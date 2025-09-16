@@ -199,8 +199,10 @@ Param represents a parameter for a collector
 .Appears In:
 ****
 - xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectoritem[$$CollectorItem$$]
-- xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipelineref[$$PipelineRef$$]
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelinerefintenantpipeline[$$PipelineRefInTenantPipeline$$]
 - xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-paramindefiningpipelineref[$$ParamInDefiningPipelineRef$$]
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-tenantpipeline[$$TenantPipeline$$]
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectoriteminreleaseplan[$$CollectorItemInReleasePlan$$]
 ****
 
 [cols="20a,50a,15a,15a", options="header"]
@@ -263,6 +265,8 @@ Param defines the parameters for a given resolver in PipelineRef
 .Appears In:
 ****
 - xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelinerefinreleaseplanadmissionpipeline[$$PipelineRefInReleasePlanAdmissionPipeline$$]
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelinerefinfinalpipeline[$$PipelineRefInFinalPipeline$$]
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelinerefintenantpipeline[$$PipelineRefInTenantPipeline$$]
 ****
 
 [cols="20a,50a,15a,15a", options="header"]
@@ -283,6 +287,8 @@ Timeouts defines the different Timeouts to use in the PipelineRun execution
 .Appears In:
 ****
 - xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionpipeline[$$ReleasePlanAdmissionPipeline$$]
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-finalpipeline[$$FinalPipeline$$]
+- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-tenantpipeline[$$TenantPipeline$$]
 ****
 
 [cols="20a,50a,15a,15a", options="header"]
