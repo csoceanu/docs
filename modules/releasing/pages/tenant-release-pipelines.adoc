@@ -241,6 +241,18 @@ The Release object's `status` fields have been updated with `artifacts`, `collec
 . The `tenantProcessing` field contains information about the release tenant processing.
 . The `target` field is a string that references where the Release is targeted to.
 
+== ReleasePlan `spec` fields ==
+The ReleasePlan object's `spec` fields have been updated to include the `collectors` field and to change `pipelineRef` to `pipeline`.
+
+. The `collectors` field contains all the information of the collectors to be executed as part of the release workflow.
+. The `pipeline` field contains all the information about the managed pipeline, including its `pipelineRef`, `serviceAccountName`, `timeouts`, and `taskRunSpecs`.
+
+== ReleasePlanAdmission `spec` fields ==
+The ReleasePlanAdmission object's `spec` fields have been updated to include the `collectors` field and to change `pipelineRef` to `pipeline`, while removing `approvalMode`, `autoRelease`, and `notificationConfig`.
+
+. The `collectors` field contains all the information of the collectors to be executed as part of the release workflow.
+. The `pipeline` field contains all the information about the managed pipeline, including its `pipelineRef`, `serviceAccountName`, and `timeouts`.
+
 == Next steps ==
 
 Now that the ReleasePlan is defined, the development team can create a Release object to reference a specific Snapshot and the new ReleasePlan. It indicates the users' intent to release that Snapshot via the tenant release pipeline defined in the ReleasePlan.
