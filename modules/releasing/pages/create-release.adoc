@@ -6,15 +6,17 @@ with its associated xref:create-release-plan.adoc[ReleasePlan].
 
 == Creating a `Release` object
 
-The development team creates a `Release` object in the developer tenant namespace. The `Release` object includes a reference to the application snapshot that the development team wants to release, along with release plan that will be used to release the application.
+The development team creates a `Release` object in the developer tenant namespace. The `Release` object includes a reference to the application component snapshot that the development team wants to release, along with release plan that will be used to release the application.
 
-.*Prerequisites*
+. The `Release` object can also contain additional data or specify a custom timeout for the release pipeline.
+
+*Prerequisites*
 
 * You have an existing Development tenant namespace.
 * You have completed the steps listed in the xref:ROOT:getting-started.adoc#getting-started-with-the-cli[Getting started in the CLI] page.
 * You have completed the steps for creating a ReleasePlanAdmission and a matching ReleasePlan.
 
-.*Procedures*
+*Procedures*
 
 . Create a `Release.yaml` object locally.
 
@@ -26,41 +28,6 @@ include::releasing:partial$example-manual-release.adoc[]
 [source,shell]
 ----
 $ kubectl create -f Release.yaml
-----
-
-.*Verification*
-
-. In the {ProductName} UI, select the *Applications* tab
-. Click on the application that is being released
-. Click on the *Releases* tab
-. See the recent releases that have been created for the application.
-. You can find a link to the release pipeline run by clicking on the name of the release that you created.
-
-== "Re-triggering" a `Release`
-
-`Release` objects create workloads with a finite lifecycle. Once created, a `Release` object's `spec` field cannot be modified.
-To "re-trigger" a release, create a new instance of the desired `Release` object using the same values in the `spec` field.
-
-
-WARNING: Creating multiple `Release` objects for the same snapshot can result in duplicate actions taken during the release process.
-Consult with the team managing the release pipeline before creating a new `Release` object for a given snapshot.
-
-.*Procedures*
-
-. Create a new `Release.yaml` object locally, using similar values to the original `Release` object.
-
-.. Use `kubectl` to obtain the data of an existing `Release` object:
-+
-[source,shell]
-----
-$ kubectl get release <release-name> -n <dev-tenant-namespace> -o yaml > Release.yaml
-----
-
-.. Alternatively, use https://github.com/itaysk/kubectl-neat[kubectl-neat] to remove unnecessary fields from the `Release` object:
-+
-[source,shell]
-----
-$ kubectl neat get release <release-name> -n <dev-tenant-namespace> -o yaml > Release.yaml
 ----
 
 . Remove the following fields from the `Release.yaml` object:
@@ -86,11 +53,8 @@ include::releasing:partial$example-manual-release.adoc[]
 $ kubectl create -f Release.yaml
 ----
 
-.*Verification*
+*Verification*
 
 . In the {ProductName} UI, select the *Applications* tab
-. Click the released application
-. Click the *Releases* tab
-. View the recent releases created for the application
-. Click the name of the release to view the results of its release pipeline
 
+IMPORTANT: The `Release` object now includes an optional `data` field to provide unstructured data for the release pipeline and a `gracePeriodDays` field to define the release expiration time. The `spec.environment` field has been removed. The `status` field has also been significantly updated to include detailed information about `artifacts`, `collectors`, `collectorsProcessing`, `expirationTime`, `finalProcessing`, `managedProcessing`, and `tenantProcessing`, replacing the simpler `phase` and `deployment` fields.

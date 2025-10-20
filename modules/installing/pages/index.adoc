@@ -9,3 +9,15 @@ Before tapping into the vast array of benefits offered by {ProductName}, the ini
 . *Using Kubernetes manifests*: This option supports any image registry and involves fewer initial setup steps.
 
 For detailed instructions, refer to the link:https://github.com/konflux-ci/konflux-ci/blob/main/README.md[installation guide].
+
+Additionally, {ProductName} now includes enhanced documentation automation. This feature automatically updates documentation based on code changes by commenting `[update-docs]` on a Pull Request. This ensures that the documentation always reflects the latest state of the codebase, improving accuracy and reducing manual effort.
+
+[[enhanced-observability]]
+==== Enhanced Observability
+
+This update introduces enhanced monitoring, webhook support, and network policies for better observability and security within {ProductName}.
+
+* *Monitoring*: Enabled standardized labeling for resource identification and monitoring, ensuring that pods running in namespaces labeled `metrics: enabled` can gather metrics.
+* *Webhook Server*: The webhook server is now enabled for validation and mutation purposes. CRs that require webhooks and are applied on namespaces labeled `webhooks: enabled` can communicate with the webhook server.
+* *Certificate Manager*: The certificate manager is enabled for automated TLS certificate management, which is required by webhook components.
+* *Network Policies*: Network policies are enabled to enhance the security posture of the deployment.

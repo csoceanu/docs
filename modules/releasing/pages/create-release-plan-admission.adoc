@@ -2,7 +2,7 @@
 
 A ReleasePlanAdmission (RPA) CR exists within a managed tenant namespace. It defines the specific pipeline to run and a given xref:compliance:index.adoc[Conforma] Policy which needs to pass for the Snapshot before that pipeline can proceed.
 
-When an application is ready for release, the Development team contacts the owners of the managed tenant namespace (for example, their organization's SRE team) and  requests access to the managed tenant namespace. A RPA object is then created in the managed tenant namespace to specify the configuration.
+When an application is ready for release, the Development team contacts the owners of the managed tenant namespace (for example, their organization's SRE team) and requests access to the managed tenant namespace. A RPA object is then created in the managed tenant namespace to specify the configuration.
 
 == Creating a `ReleasePlanAdmission` object
 
@@ -25,36 +25,62 @@ When an application is ready for release, the Development team contacts the owne
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: ReleasePlanAdmission
 metadata:
- labels:
-   release.appstudio.openshift.io/block-releases: 'false' <.>
- name: sre-production <.>
- namespace: managed-tenant-namespace <.>
+  creationTimestamp: "2024-01-26T14:30:00Z" <.>
 spec:
- applications:
+  applications:
   - demo-app <.>
- data: <key> <.>
- environment: <sre-production> <.>
- origin: <dev-tenant-namespace> <.>
- pipelineRef: <pipeline_ref> <.>
- policy: <policy> <.>
- serviceAccount: <service-account> <.>
-
+  collectors: <.>
+    items: <.>
+    - name: <collector-name> <.>
+      params: <.>
+      - name: <param-name> <.>
+        value: <param-value> <.>
+      type: <collector-type> <.>
+      timeout: <collector-timeout> <.>
+    serviceAccountName: <collector-service-account> <.>
+  data: {} <.>
+  environment: <sre-production> <.>
+  origin: <dev-tenant-namespace> <.>
+  pipeline: <.>
+    pipelineRef: <.>
+      params: <params> <.>
+      resolver: <resolver> <.>
+    serviceAccountName: <pipeline-service-account> <.>
+    timeouts: <.>
+      finally: <finally-timeout> <.>
+      pipeline: <pipeline-timeout> <.>
+      tasks: <tasks-timeout> <.>
+  policy: <policy> <.>
 ----
 
 +
-<.> Optional: Control whether or not this ReleasePlanAdmission is entirely disabled. If set to true, attempted releases will fail with a validation error. Defaults to false.
-<.> The name of the release plan admission.
-<.> The Managed environment team's tenant namespace.
+<.> Specifies the timestamp when the object was created.
 <.> A list of applications that you want to enable to be deployed in the managed tenant namespace.
-<.> Optional: An unstructured key used for providing data for the managed Pipeline.
-<.> Optional: The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
+<.> Contains all the information of the collectors to be executed as part of the release workflow.
+<.> The list of collectors to be executed as part of the release workflow.
+<.> The name of the collector.
+<.> A slice of parameters for a given collector.
+<.> The name of the parameter.
+<.> The value of the parameter.
+<.> The type of collector to be used.
+<.> Timeout in seconds for the collector to execute.
+<.> The service account to use during the execution of the Collectors Pipeline.
+<.> Optional: Unstructured key for providing data for the managed Release Pipeline.
+<.> The environment from which the application updates are allowed to be received in the Managed tenant namespace. This environment is created by the Development team.
 <.> The development team tenant namespace where the application is defined.
-<.> Reference to the Pipeline to be executed by the release service.
+<.> Contains all the information about the managed Pipeline.
+<.> The reference to the Pipeline.
+<.> Parameters for the referenced pipeline.
+<.> Name of a Tekton resolver to be used (for example, `git`).
+<.> The service account to use during the execution of the Pipeline.
+<.> Defines the different timeouts to use in the PipelineRun execution.
+<.> Sets the maximum allowed duration of this pipeline's `finally` tasks.
+<.> Sets the maximum allowed duration for execution of the entire pipeline. The sum of individual timeouts for tasks and finally must not exceed this value.
+<.> Sets the maximum allowed duration of this pipeline's tasks.
 <.> The enterprise contract policy against which the system validates an application before releasing it to production.
-<.> Optional: The name of the service account to use in the Pipeline to gain elevated privileges. It's used only if you have defined the `pipelineRef` value.
 
 +
-NOTE: The  ReleasePlanAdmission.yaml represents the reciprocal link to the ReleasePlan.yaml objects created by the development team.
+NOTE: The ReleasePlanAdmission.yaml represents the reciprocal link to the ReleasePlan.yaml objects created by the development team.
 
 . In the Managed tenant namespace, apply the `ReleasePlanAdmission.yaml` file and add the resource to your cluster by running the following command:
 
@@ -68,4 +94,4 @@ kubectl apply -f ReleasePlanAdmission.yaml -n managed
 
 . In the {ProductName} UI, select the *Release services* > *Release plan admission* tab.
 . Review the RPA object that you just added. Using the Release plan admission tab, you can update or delete the selected Release plan admission object.
-. When a ReleasePlanAdmission is correctly configured to be paired with a ReleasePlan, its *Status* will display as being `Matched`.
+. When a ReleasePlanAdmission is correctly configured to be paired with a ReleasePlan, its *Status* will display as being `Active`.

@@ -6,31 +6,48 @@ To overcome this, there are two strategies {ProductName} users can follow.
 
 == Adjust timeouts
 
-Whenever a pipeline is defined through the tenantPipeline/finalPipeline fields in the ReleasePlan or the pipeline field in the ReleasePlanAdmission, users can specify a `timeouts` field in the following way:
+Whenever a pipeline is defined through the xref:release-service-reference.adoc#releaseplan_spec[pipelineRef field in the ReleasePlan] or the xref:release-service-reference.adoc#releaseplanadmission_spec[pipelineRef field in the ReleasePlanAdmission], users can specify a `timeout` field in the following way:
 
 [source,yaml]
 ----
-pipeline:
-  pipelineRef:
-    resolver: git
-    params:
-      - name: url
-        value: "<url-to-repo>.git"
-      - name: revision
-        value: main
-      - name: pathInRepo
-        value: "<path-to-your-pipeline>"
-  timeouts:
-    pipeline: "2h0m0s" <.>
-    tasks: "1h0m0s" <.>
-    finally: "1h0m0s" <.>
+pipelineRef:
+  resolver: git
+  params:
+    - name: url
+      value: "<url-to-repo>.git"
+    - name: revision
+      value: main
+    - name: pathInRepo
+      value: "<path-to-your-pipeline>"
+  timeout: "2h0m0s" <.>
 ----
 
-<.> specifies the timeout for the entire PipelineRun. Defaults to the global configurable default timeout of 60 minutes.
-<.> specifies the timeout for the cumulative time taken by non-finally Tasks specified in the Pipeline.
-<.> timeout for the cumulative time taken by finally Tasks.
+<.> Specifies the timeout for the entire PipelineRun. Defaults to the global configurable default timeout of 60 minutes.
 
-IMPORTANT: Tekton enforces a restriction on the pipeline timeout—it must be greater than or equal to the sum of the timeouts for tasks and finally.
+With the new API, the `timeout` field in `ReleasePlanAdmission` has been moved and expanded into `pipeline.timeouts` to allow for more granular control over task and finally timeouts.
+
+[source,yaml]
+----
+spec:
+  pipeline:
+    pipelineRef:
+      params:
+        - name: url
+          value: "<url-to-repo>.git"
+        - name: revision
+          value: main
+        - name: pathInRepo
+          value: "<path-to-your-pipeline>"
+      resolver: git
+    serviceAccountName: release-service-account
+    timeouts:
+      finally: "15m0s" <.>
+      pipeline: "2h0m0s" <.>
+      tasks: "1h30m0s" <.>
+----
+<.> Specifies the maximum allowed duration for the `finally` section of the pipeline.
+<.> Specifies the maximum allowed duration for the execution of the entire pipeline. The sum of individual timeouts for tasks and finally must not exceed this value.
+<.> Specifies the maximum allowed duration for the pipeline's tasks.
 
 == Adjust resources
 
@@ -50,11 +67,9 @@ metadata:
 spec:
   applications:
     - demo-app
-  data: <key>
   origin: <dev-tenant-namespace>
   pipeline:
     pipelineRef:
-      resolver: git
       params:
         - name: url
           value: "<url-to-repo>.git"
@@ -62,18 +77,20 @@ spec:
           value: main
         - name: pathInRepo
           value: "<path-to-your-pipeline>"
-    serviceAccountName: release-service-account
+      resolver: git
+    serviceAccountName: release-service-account <.>
     taskRunSpecs:
-      - pipelineTaskName: verify-enterprise-contract <.>
-        computeResources: <.>
-          limits:
-            cpu: "600m"
-            memory: "540Mi"
+      - pipelineTaskName: verify-enterprise-contract
+        computeResources:
           requests:
-            cpu: "250m"
-            memory: "256Mi"
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 2Gi
+    timeouts:
+      pipeline: "2h0m0s"
   policy: <policy>
 ----
 
-<.> Name of the Task we want to modify.
-<.> Compute resources we want to assign to the task.
+<.> Name of the service account to use in the Release PipelineRun to gain elevated privileges. This field has been moved from the top-level `spec` to `spec.pipeline`.

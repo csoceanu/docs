@@ -3,7 +3,7 @@
 The usual release process in {ProductName} involves two different teams: a *Development team* and a *Managed environment team* as described in
 xref:releasing:index.adoc[Releasing an application]. The development team is usually the one who develops and support the application while the managed team will control the process and the secrets. Although this is a powerful workflow, in some cases it might feel very limiting. For example, sometimes the Development team wants to release their software to some destination that is directly under their control, using their own secrets, without depending on a Managed environment team. Another example would be performing actions before running the managed pipeline such as cleaning up old images or notifying about an ongoing release. The way {ProductName} supports these scenarios is by using something we call a *tenant release pipeline*. It's a release pipeline that runs in the tenant namespace of the Development team, rather than in that of the Managed environment team.
 
-The gist here is that this workflow doesn't require a managed pipeline. You can omit the `target` and just specify the `tenant pipeline` you want to run. But, if both tenant and managed pipelines are provided, the tenant pipeline needs to succeed before continuing with the release of the application.
+The gist here is that this workflow doesn't require a managed pipeline. You can omit the `target` and just specify the `pipelineRef` you want to run. But, if both tenant and managed pipelines are provided, the tenant pipeline needs to succeed before continuing with the release of the application.
 
 == Using a tenant pipeline ==
 
@@ -17,12 +17,11 @@ Before starting to use a tenant pipeline there are some prerequisites you will h
 To use a tenant pipeline:
 
 . Follow the regular instruction to xref:releasing:create-release-plan.adoc[create a ReleasePlan] YAML file locally.
-. Specify the details about the tenant pipeline to run using the `tenantPipeline` field.
+. Specify the details about the tenant pipeline to run using the `pipelineRef` field and `serviceAccount` field.
 
 +
 *Example `ReleasePlan.yaml` object*
 
-+
 [source,yaml]
 ----
 apiVersion: appstudio.redhat.com/v1alpha1
@@ -41,15 +40,12 @@ spec:
         - name: demo-component-1
           repository: registry/destination-image-repository-1
           tags: [latest]
-        - name: demo-component-2
-          repository: registry/destination-image-repository-2
-          tags: [latest]
   target: managed-tenant-namespace
-  tenantPipeline:
-    params: <.>
-    - name: paramForPipeline
-      value: foo
+  pipeline: <.>
     pipelineRef: <.>
+      params: <.>
+      - name: paramForPipeline
+        value: foo
       resolver: git
       params:
         - name: url
@@ -61,19 +57,18 @@ spec:
     serviceAccountName: build-pipeline-$COMPONENT_NAME <.>
 ----
 
-+
 <.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.
 <.> The development team's tenant namespace.
 <.> The name of the application that you want to release via a pipeline in the development tenant namespace.
 <.> A list containing the destination repository for each component
-<.> The parameters to pass to your pipeline. Note: the release-operator will automatically pass parameters `taskGitRevision` and `taskGitUrl` with the same values as the `pipelineRef` `revision` and `pipelineRef` `url` parameters respectively. So, you should not pass your own values for these two parameters in this section. If you do, tekton validation webhooks will block the pipelineRun creation.
+<.> Defines the managed pipeline and its execution details.
 <.> Reference to the tenant pipeline to be executed in the development tenant namespace.
+<.> The parameters to pass to your pipeline. Note: the release-operator will automatically pass parameters `taskGitRevision` and `taskGitUrl` with the same values as the `pipelineRef` `revision` and `pipelineRef` `url` parameters respectively. So, you should not pass your own values for these two parameters in this section. If you do, tekton validation webhooks will block the pipelineRun creation.
 <.> The name of the service account used to execute the tenant pipeline.
 
 . In case you want to avoid the execution of a managed pipeline, remove the `target` field from your `ReleasePlan.yaml` file.
 . In the Development tenant namespace, apply the `ReleasePlan.yaml` file and add the resource to your cluster by running the following command:
 
-+
 [source,shell]
 ----
 kubectl apply -f ReleasePlan.yaml -n dev
@@ -85,7 +80,6 @@ kubectl apply -f ReleasePlan.yaml -n dev
 +
 *Example `rbac.yaml` object*
 
-+
 [source,yaml]
 ----
 apiVersion: rbac.authorization.k8s.io/v1
@@ -120,7 +114,6 @@ subjects:
   namespace: dev-tenant-namespace <.>
 ----
 
-+
 <.> The name of the Role.
 <.> The development team's tenant namespace.
 <.> The name of the RoleBinding.
@@ -131,7 +124,6 @@ subjects:
 
 . In the Development tenant namespace, apply the `rbac.yaml` file and add the resources to your cluster by running the following command:
 
-+
 [source,shell]
 ----
 kubectl apply -f rbac.yaml -n dev-tenant-namespace
@@ -175,7 +167,7 @@ spec:
 
 If you write a good reusable release pipeline, please submit it to our link:https://github.com/konflux-ci/community-catalog[community catalog], so others can use it.
 
-== Final pipeline
+== Final pipeline ==
 
 Another type of tenant pipeline runs at the end of the release workflow. This is known as the final pipeline, and it allows you to execute a pipeline after the tenant or managed pipeline has completed.
 
@@ -192,8 +184,16 @@ kind: ReleasePlan
 ...
 spec:
   ...
-  finalPipeline:
+  pipeline:
+    ...
+    timeouts: <.>
+      pipeline: 1h0m0s
+    ...
+  finalPipeline: <.>
     pipelineRef: <.>
+      params: <.>
+      - name: paramForPipeline
+        value: foo
       resolver: git
       params:
         - name: url
@@ -204,10 +204,55 @@ spec:
           value: "<path-to-your-pipeline>"
     serviceAccountName: build-pipeline-$COMPONENT_NAME <.>
 ----
-<.> Reference to the tenant pipeline to be executed in the development tenant namespace.
+<.> Defines timeouts for the different stages of the Release PipelineRun execution.
+<.> Defines the final pipeline and its execution details.
+<.> Reference to the final pipeline to be executed in the development tenant namespace.
+<.> The parameters to pass to your pipeline. Note: the release-operator will automatically pass parameters `taskGitRevision` and `taskGitUrl` with the same values as the `pipelineRef` `revision` and `pipelineRef` `url` parameters respectively. So, you should not pass your own values for these two parameters in this section. If you do, tekton validation webhooks will block the pipelineRun creation.
 <.> The name of the service account used to execute the tenant pipeline.
 
 Both tenant and final pipelines receive the same parameters (i.e. release, releasePlan, and snapshot), allowing them to be used interchangeably. The key difference is that the final pipeline runs at the end of the release workflow, meaning the release status will contain the final outcome and all generated artifacts.
+
+== Kustomization updates ==
+
+The `config/default/kustomization.yaml` file has been updated to include standardized labels, and enable webhook, cert-manager, and network policy configurations.
+
+. *Labels*: Adds `app.kubernetes.io/name: build-service`, `app.kubernetes.io/component: controller`, and `monitoring: enabled` to all resources and selectors for better resource identification and monitoring.
+. *Webhook*: Enables the webhook server for validation and mutation.
+. *Cert-manager*: Enables cert-manager for automated TLS certificate management.
+. *Network policy*: Enables network policies for enhanced security posture.
+
+== Release object `spec` fields ==
+
+The Release object's `spec` fields have been updated to reflect the new `data` field and `gracePeriodDays` field, while removing `environment` and `rollbackEnabled`.
+
+. The `data` field is an unstructured key used for providing data for the managed Release Pipeline.
+. The `gracePeriodDays` field is the number of days a Release should be kept after completion. This value is used to define the Release ExpirationTime for cleanup purposes.
+
+== Release object `status` fields ==
+
+The Release object's `status` fields have been updated with `artifacts`, `collectors`, `collectorsProcessing`, `expirationTime`, `finalProcessing`, `managedProcessing`, and `tenantProcessing` fields, while removing `deployment`, `phase`, `postActionsExecution`, and `processing`.
+
+. The `artifacts` field is an unstructured key used for storing all the artifacts generated by the managed Release Pipeline.
+. The `collectors` field is an unstructured key used for storing all the collectors results generated by the Collectors Pipeline.
+. The `collectorsProcessing` field contains information about the release collectors processing.
+. The `expirationTime` field is the time when a Release can be purged.
+. The `finalProcessing` field contains information about the release final processing.
+. The `managedProcessing` field contains information about the release managed processing.
+. The `tenantProcessing` field contains information about the release tenant processing.
+. The `target` field is a string that references where the Release is targeted to.
+
+== ReleasePlan `spec` fields ==
+The ReleasePlan object's `spec` fields have been updated to include the `collectors` field and to change `pipelineRef` to `pipeline`.
+
+. The `collectors` field contains all the information of the collectors to be executed as part of the release workflow.
+. The `pipeline` field contains all the information about the managed pipeline, including its `pipelineRef`, `serviceAccountName`, `timeouts`, and `taskRunSpecs`.
+
+== ReleasePlanAdmission `spec` fields ==
+The ReleasePlanAdmission object's `spec` fields have been updated to include the `collectors` field and to change `pipelineRef` to `pipeline`, while removing `approvalMode`, `autoRelease`, and `notificationConfig`.
+
+. The `collectors` field contains all the information of the collectors to be executed as part of the release workflow.
+. The `pipeline` field contains all the information about the managed pipeline, including its `pipelineRef`, `serviceAccountName`, and `timeouts`.
+. The `metadata.creationTimestamp` field is a standard Kubernetes field indicating the time when the ReleasePlanAdmission object was created. It is used to display the 'Age' of the resource.
 
 == Next steps ==
 
