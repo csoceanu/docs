@@ -252,6 +252,7 @@ The ReleasePlanAdmission object's `spec` fields have been updated to include the
 
 . The `collectors` field contains all the information of the collectors to be executed as part of the release workflow.
 . The `pipeline` field contains all the information about the managed pipeline, including its `pipelineRef`, `serviceAccountName`, and `timeouts`.
+. The `metadata.creationTimestamp` field is a standard Kubernetes field indicating the time when the ReleasePlanAdmission object was created. It is used to display the 'Age' of the resource.
 
 == Next steps ==
 

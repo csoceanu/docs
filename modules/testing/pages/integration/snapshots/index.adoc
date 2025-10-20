@@ -20,6 +20,7 @@ kind: Snapshot
 metadata:
   name: snapshot-sample <.>
   namespace: ws-sample-tenant <.>
+  creationTimestamp: "2024-01-25T15:10:00Z"
 spec:
   application: application-sample <.>
   components:

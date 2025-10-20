@@ -111,6 +111,8 @@ ReleasePlanAdmissionSpec defines the desired state of ReleasePlanAdmission.
 | Field | Description | Default | Validation
 | *`applications`* __string array__ | Applications is a list of references to applications to be released in the managed namespace +
 | |
+| *`autoRelease`* __boolean__ | AutoRelease indicates whether the Release should be created automatically +
+| `false` |
 | *`collectors`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissioncollectors[$$ReleasePlanAdmissionCollectors$$]__ | Collectors contains all the information of the collectors to be executed as part of the release workflow +
 | |
 | *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the managed Release Pipeline +

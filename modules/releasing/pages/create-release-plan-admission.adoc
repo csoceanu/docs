@@ -25,6 +25,7 @@ When an application is ready for release, the Development team contacts the owne
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: ReleasePlanAdmission
 metadata:
+  creationTimestamp: "2024-01-26T14:30:00Z" <.>
 spec:
   applications:
   - demo-app <.>
@@ -53,6 +54,7 @@ spec:
 ----
 
 +
+<.> Specifies the timestamp when the object was created.
 <.> A list of applications that you want to enable to be deployed in the managed tenant namespace.
 <.> Contains all the information of the collectors to be executed as part of the release workflow.
 <.> The list of collectors to be executed as part of the release workflow.
