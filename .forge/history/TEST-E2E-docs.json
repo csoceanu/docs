@@ -1,0 +1,1137 @@
+{
+  "task_key": "TEST-E2E-docs",
+  "task_summary": "Update stale documentation in docs repo",
+  "messages": [
+    {
+      "role": "human",
+      "content": "Implement this task:\n\nUpdate documentation files that have become stale due to code changes in a separate repository.\n\n## Workspace\n\n/tmp/forge-TEST-E2E-ub3p_5se\n\n## Code Changes\n\nThe following changes were made in the code repository:\n\ndiff --git a/api/v1alpha1/releaseplan_types.go b/api/v1alpha1/releaseplan_types.go\nindex 59c78e4..12727e1 100644\n--- a/api/v1alpha1/releaseplan_types.go\n+++ b/api/v1alpha1/releaseplan_types.go\n@@ -52,16 +52,26 @@ type ReleasePlanSpec struct {\n \t// +optional\n \tFinalPipeline *tektonutils.ParameterizedPipeline `json:\"finalPipeline,omitempty\"`\n \n-\t// ReleaseGracePeriodDays is the number of days a Release should be kept\n+\t// RetentionDays is the number of days a Release should be kept\n \t// This value is used to define the Release ExpirationTime\n-\t// +kubebuilder:default:=7\n+\t// +kubebuilder:default:=14\n \t// +optional\n-\tReleaseGracePeriodDays int `json:\"releaseGracePeriodDays,omitempty\"`\n+\tRetentionDays int `json:\"retentionDays,omitempty\"`\n \n \t// Target references where to send the release requests\n \t// +kubebuilder:validation:Pattern=^[a-z0-9]([-a-z0-9]*[a-z0-9])?$\n \t// +optional\n \tTarget string `json:\"target,omitempty\"`\n+\n+\t// NotificationRecipients is a list of email addresses to notify when a Release\n+\t// is created, completes, or fails. If empty, no notifications are sent.\n+\t// +optional\n+\tNotificationRecipients []string `json:\"notificationRecipients,omitempty\"`\n+\n+\t// RequireApproval when set to true, Releases created from this ReleasePlan\n+\t// will be held in a pending state until manually approved. Defaults to false.\n+\t// +optional\n+\tRequireApproval bool `json:\"requireApproval,omitempty\"`\n }\n \n // MatchedReleasePlanAdmission defines the relevant information for a matched ReleasePlanAdmission.\n\n## Project Guidelines\n\n\n\nRead `.forge/handoff.md` first (if it exists) to understand what was implemented and why. Then follow the update-docs skill process to find and update any documentation files whose content has become incorrect due to the code changes shown above.\n",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "I'll start by reading the handoff file and then use the update-docs skill to identify and update stale documentation.",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_012CFMJg4G6FxWXQMx1Xns9u",
+          "caller": null,
+          "input": {
+            "file_path": "/tmp/forge-TEST-E2E-ub3p_5se/.forge/handoff.md"
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        },
+        {
+          "id": "toolu_vrtx_016S8qJAtgbJ4Cy32hNNFUEx",
+          "caller": null,
+          "input": {
+            "file_path": "/skills/skill_0/update-docs/SKILL.md",
+            "limit": 1000
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/tmp/forge-TEST-E2E-ub3p_5se/.forge/handoff.md"
+          },
+          "id": "toolu_vrtx_012CFMJg4G6FxWXQMx1Xns9u",
+          "type": "tool_call"
+        },
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/skills/skill_0/update-docs/SKILL.md",
+            "limit": 1000
+          },
+          "id": "toolu_vrtx_016S8qJAtgbJ4Cy32hNNFUEx",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "Error: File '/tmp/forge-TEST-E2E-ub3p_5se/.forge/handoff.md' not found",
+      "tool_calls": null
+    },
+    {
+      "role": "tool",
+      "content": "     1\t---\n     2\tname: update-docs\n     3\tdescription: >-\n     4\t  Detects documentation files that have become stale due to code changes\n     5\t  and applies targeted updates.\n     6\t---\n     7\t\n     8\t# Update Docs\n     9\t\n    10\tCode changes can silently invalidate documentation. A renamed function,\n    11\ta changed API signature, a removed configuration option \u2014 each can leave\n    12\tdocs describing behavior that no longer exists. This skill detects that\n    13\tdrift by matching the code diff against in-repo documentation and\n    14\tupdating docs whose descriptions contradict the new code.\n    15\t\n    16\t## Process\n    17\t\n    18\tFollow these steps in order. Do not skip steps.\n    19\t\n    20\t### 1. Get the diff\n    21\t\n    22\t```bash\n    23\tDEFAULT_BRANCH=$(git rev-parse --abbrev-ref origin/HEAD | cut -d/ -f2)\n    24\tgit diff $(git merge-base HEAD \"$DEFAULT_BRANCH\")..HEAD --no-color\n    25\t```\n    26\t\n    27\tRecord the list of files changed in the PR:\n    28\t\n    29\t```bash\n    30\tgit diff --name-only $(git merge-base HEAD \"$DEFAULT_BRANCH\")..HEAD\n    31\t```\n    32\t\n    33\tIf the diff is empty, output `NO_DOCS_UPDATED` and stop.\n    34\t\n    35\t### 2. Discover documentation files\n    36\t\n    37\tExplore the repository structure to identify where documentation lives.\n    38\tDifferent repos organize docs differently \u2014 look for dedicated doc\n    39\tdirectories, standalone files like README.md at any level, and any\n    40\tother files whose primary purpose is documentation.\n    41\t\n    42\tSearch broadly \u2014 include diagram and config files that live alongside\n    43\tdocs:\n    44\t\n    45\t```bash\n    46\tfind . -type f \\( -name \"*.md\" -o -name \"*.rst\" -o -name \"*.adoc\" \\\n    47\t  -o -name \"*.txt\" -o -name \"*.mmd\" -o -name \"*.puml\" \\\n    48\t  -o -name \"*.yaml\" -o -name \"*.yml\" \\) \\\n    49\t  ! -path \"./.git/*\" ! -path \"./.forge/*\" ! -path \"./vendor/*\" \\\n    50\t  ! -path \"./node_modules/*\" \\\n    51\t  | head -500\n    52\t```\n    53\t\n    54\tThen filter the results:\n    55\t\n    56\t- **Exclude** files already modified in the PR (they are being actively\n    57\t  updated \u2014 check against the changed file list from step 1)\n    58\t- **Exclude** auto-generated files (lockfiles, generated API docs,\n    59\t  swagger output)\n    60\t- **Exclude** changelog and release note entries that describe past\n    61\t  releases\n    62\t- **Exclude** YAML/YML files that are not documentation. Only keep\n    63\t  YAML files that live in doc directories or are clearly documentation\n    64\t  examples.\n    65\t\n    66\tIf no documentation files exist in the repo, output `NO_DOCS_FOUND`\n    67\tand stop.\n    68\t\n    69\t### 3. Build the identifier checklist\n    70\t\n    71\tGo through **every** changed file in the PR. For each file, extract\n    72\tidentifiers from the modified lines (lines starting with `+` or `-`)\n    73\tand from diff hunk headers (`@@` lines). Write them down as a numbered\n    74\tchecklist \u2014 one entry per changed file, with all identifiers from that\n    75\tfile.\n    76\t\n    77\tUse the most specific form of each identifier. CLI flag names,\n    78\tconfiguration keys, full function names, and type names are good \u2014\n    79\tthey match only relevant docs. Avoid generic short words that would\n    80\tmatch hundreds of unrelated files. If a generic term is the only\n    81\tidentifier available for a change, include it, but prefer specific\n    82\tforms when they exist.\n    83\t\n    84\tDo not skip files. Do not prioritize some files over others. Every\n    85\tchanged file gets an entry in the checklist.\n    86\t\n    87\t### 4. Search docs for every identifier\n    88\t\n    89\tWrite a shell script that takes the identifiers from step 3 and\n    90\tgreps for each one across the documentation files from step 2.\n    91\tRun the script in a single Bash call:\n    92\t\n    93\t```bash\n    94\tfor id in \"identifier1\" \"identifier2\" \"identifier3\"; do\n    95\t  matches=$(grep -rlFi \"$id\" <doc_files> 2>/dev/null)\n    96\t  if [ -n \"$matches\" ]; then\n    97\t    echo \"MATCH: $id -> $matches\"\n    98\t  fi\n    99\tdone\n   100\t```\n   101\t\n   102\tInclude every identifier from every checklist entry in the `for`\n   103\tloop. The script handles the searching mechanically \u2014 no identifiers\n   104\tare skipped.\n   105\t\n   106\tFrom the script output, collect all matched doc files into a\n   107\tcandidate list.\n   108\t\n   109\t### 5. Evaluate candidates (two passes)\n   110\t\n   111\t**Pass 1 \u2014 Quick scan.** For each candidate, view only the lines\n   112\tthat matched the grep (use `grep -n` to see them in context). Based\n   113\ton the matching lines alone, give a quick verdict:\n   114\t\n   115\t```\n   116\t- path/to/doc.md -> possibly stale (describes behavior that changed)\n   117\t- path/to/other.md -> not stale (mentions identifier in passing)\n   118\t```\n   119\t\n   120\tEvery candidate must have a verdict. Do not skip candidates.\n   121\t\n   122\t**Pass 2 \u2014 Deep read.** Only for candidates marked \"possibly stale\"\n   123\tin pass 1. Read the full file alongside the relevant section of the\n   124\tdiff. Confirm whether the doc is actually stale. Check the file\n   125\theader for auto-generation markers \u2014 if the file is generated from\n   126\tsource, skip it.\n   127\t\n   128\tWhen evaluating:\n   129\t\n   130\t- **Only flag docs whose content is now incorrect.** A doc that\n   131\t  mentions an identifier is not stale if the described behavior is\n   132\t  unchanged. It is stale only if the behavior, signature, or semantics\n   133\t  changed in a way that makes the doc misleading.\n   134\t- **Do not flag changelog entries or release notes that describe past\n   135\t  releases.** Historical entries are not stale because the code evolved.\n   136\t\n   137\t### 6. Review beyond grep results\n   138\t\n   139\tThis step catches stale references that grep cannot find because\n   140\tdocumentation often uses prose names that differ from code identifiers,\n   141\tand new code introduces identifiers that don't exist in any doc yet.\n   142\t\n   143\tAlways read the repository's README. Also read any main index or\n   144\toverview files at the root of doc directories. Read each file fully\n   145\tand compare it against the diff. Determine whether it describes any\n   146\tbehavior, flow, or feature that the code changes affected. If it\n   147\tdoes, add it to the list of confirmed stale docs.\n   148\t\n   149\tAlso scan the discovered documentation files for any that may cover\n   150\tthe same area as the changed code, based on your understanding of\n   151\twhat the diff does. You don't need to read every file \u2014 use file\n   152\tnames and paths to decide which ones are worth checking.\n   153\t\n   154\t### 7. Update confirmed stale docs\n   155\t\n   156\tFor each doc confirmed stale:\n   157\t\n   158\t1. Read the full file\n   159\t2. Update the documentation so it accurately reflects the new code\n   160\t3. Preserve the file's existing format, style, and structure\n   161\t\n   162\t### 8. Commit changes\n   163\t\n   164\tIf any documentation files were updated:\n   165\t\n   166\t```bash\n   167\tgit add <updated_doc_files>\n   168\tgit commit -m \"[TICKET_KEY] docs: update documentation for code changes\"\n   169\t```\n   170\t\n   171\tReplace TICKET_KEY with the actual ticket key from the task context.\n   172\t\n   173\t### 9. Output\n   174\t\n   175\tIf docs were updated:\n   176\t```\n   177\tDOCS_UPDATED\n   178\t\n   179\tUpdated:\n   180\t- [path/to/doc.md] Brief description of what was updated and why\n   181\t- [path/to/other.rst] Brief description\n   182\t```\n   183\t\n   184\tIf no docs needed updating:\n   185\t```\n   186\tNO_DOCS_UPDATED\n   187\t```\n   188\t\n   189\tIf no doc files found:\n   190\t```\n   191\tNO_DOCS_FOUND\n   192\t```\n   193\t\n   194\t## Constraints\n   195\t\n   196\t- **Only change what the diff affects.** Do not improve, restructure,\n   197\t  or reformat documentation that is unrelated to the code change.\n   198\t- **Do not update historical entries.** Changelog and release note\n   199\t  entries for past releases are not stale \u2014 they describe what happened\n   200\t  at that point in time.\n   201\t- **Skip auto-generated files.** Do not edit files that are generated\n   202\t  from source. They should be regenerated, not manually patched.\n   203\t- **Update existing files only.** Do not create new doc files from\n   204\t  scratch.\n   205\t- **Preserve format.** Match the existing file's formatting conventions\n   206\t  (heading style, list style, code block syntax, etc.).",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Now I'll follow the update-docs skill process step by step.\n\n### Step 1: Get the diff\n\nThe diff was provided in the task context. Let me check the workspace and get the changed files list:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01Jpj2pgpCnDatja4gc3kxfh",
+          "caller": null,
+          "input": {
+            "command": "cd /tmp/forge-TEST-E2E-ub3p_5se && pwd"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "cd /tmp/forge-TEST-E2E-ub3p_5se && pwd"
+          },
+          "id": "toolu_vrtx_01Jpj2pgpCnDatja4gc3kxfh",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "[stderr] /bin/sh: 1: cd: can't cd to /tmp/forge-TEST-E2E-ub3p_5se\n\nExit code: 2\n[Command failed with exit code 2]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_015PNvcDLUfPLPEsNbifwUJd",
+          "caller": null,
+          "input": {
+            "command": "pwd"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "pwd"
+          },
+          "id": "toolu_vrtx_015PNvcDLUfPLPEsNbifwUJd",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "/workspace\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Good, I'm in /workspace. Let me explore the structure:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01Kstnyft59E5QNB3VLH36LE",
+          "caller": null,
+          "input": {
+            "path": "/workspace"
+          },
+          "name": "ls",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "ls",
+          "args": {
+            "path": "/workspace"
+          },
+          "id": "toolu_vrtx_01Kstnyft59E5QNB3VLH36LE",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "['/workspace/.forge/', '/workspace/.git/', '/workspace/.github/', '/workspace/.gitignore', '/workspace/.vale.ini', '/workspace/.vale/', '/workspace/.vscode/', '/workspace/CODEOWNERS', '/workspace/CONTRIBUTING.md', '/workspace/README.md', '/workspace/antora-lunr-ui/', '/workspace/antora-playbook.yml', '/workspace/antora.yml', '/workspace/api-gen/', '/workspace/hack/', '/workspace/modules/', '/workspace/netlify.toml', '/workspace/package-lock.json', '/workspace/package.json']",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "This is a documentation repository with Antora structure. The code changes were in a separate repository. Let me check if there's a git repository here and look for the main branch:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01XVhwRwQhjPVVfDtWNmVorw",
+          "caller": null,
+          "input": {
+            "command": "git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD"
+          },
+          "id": "toolu_vrtx_01XVhwRwQhjPVVfDtWNmVorw",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "origin/main\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_01C1yUq44jhD5bdwCWgmaJqw",
+          "caller": null,
+          "input": {
+            "command": "git diff --name-only $(git merge-base HEAD origin/main)..HEAD"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "git diff --name-only $(git merge-base HEAD origin/main)..HEAD"
+          },
+          "id": "toolu_vrtx_01C1yUq44jhD5bdwCWgmaJqw",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "<no output>\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "The diff is empty in this repo. Since the task states that code changes were made in a **separate repository**, I need to use the provided diff to identify stale documentation. Let me understand the code changes:\n\n**Key changes from the diff:**\n1. Field renamed: `ReleaseGracePeriodDays` \u2192 `RetentionDays`\n2. Default value changed: `7` \u2192 `14`\n3. Two new fields added: `NotificationRecipients` and `RequireApproval`\n\n### Step 2: Discover documentation files",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_012NPWWRpPJjfiawwR5ZLNA5",
+          "caller": null,
+          "input": {
+            "command": "find /workspace -type f \\( -name \"*.md\" -o -name \"*.rst\" -o -name \"*.adoc\" -o -name \"*.txt\" -o -name \"*.mmd\" -o -name \"*.puml\" -o -name \"*.yaml\" -o -name \"*.yml\" \\) ! -path \"./.git/*\" ! -path \"./.forge/*\" ! -path \"./vendor/*\" ! -path \"./node_modules/*\" | head -500"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "find /workspace -type f \\( -name \"*.md\" -o -name \"*.rst\" -o -name \"*.adoc\" -o -name \"*.txt\" -o -name \"*.mmd\" -o -name \"*.puml\" -o -name \"*.yaml\" -o -name \"*.yml\" \\) ! -path \"./.git/*\" ! -path \"./.forge/*\" ! -path \"./vendor/*\" ! -path \"./node_modules/*\" | head -500"
+          },
+          "id": "toolu_vrtx_012NPWWRpPJjfiawwR5ZLNA5",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "/workspace/.forge/handoff.md\n/workspace/modules/troubleshooting/partials/konflux-releases.adoc\n/workspace/modules/troubleshooting/partials/konflux-registries.adoc\n/workspace/modules/troubleshooting/partials/konflux-builds.adoc\n/workspace/modules/troubleshooting/pages/releases.adoc\n/workspace/modules/troubleshooting/pages/registries.adoc\n/workspace/modules/troubleshooting/pages/builds.adoc\n/workspace/modules/troubleshooting/nav.adoc\n/workspace/modules/testing/pages/integration/third-parties/testing-farm.adoc\n/workspace/modules/testing/pages/integration/third-parties/rapidast.adoc\n/workspace/modules/testing/pages/integration/third-parties/openshift-ci.adoc\n/workspace/modules/testing/pages/integration/third-parties/jenkins.adoc\n/workspace/modules/testing/pages/integration/standardized-outputs.adoc\n/workspace/modules/testing/pages/integration/snapshots/working-with-snapshots.adoc\n/workspace/modules/testing/pages/integration/snapshots/override-snapshots.adoc\n/workspace/modules/testing/pages/integration/snapshots/index.adoc\n/workspace/modules/testing/pages/integration/snapshots/group-snapshots.adoc\n/workspace/modules/testing/pages/integration/rerunning.adoc\n/workspace/modules/testing/pages/integration/periodic-integration-tests.adoc\n/workspace/modules/testing/pages/integration/index.adoc\n/workspace/modules/testing/pages/integration/editing.adoc\n/workspace/modules/testing/pages/integration/debugging.adoc\n/workspace/modules/testing/pages/integration/creating.adoc\n/workspace/modules/testing/pages/integration/choosing-contexts.adoc\n/workspace/modules/testing/pages/integration/canceling.adoc\n/workspace/modules/testing/pages/integration/adding.adoc\n/workspace/modules/testing/pages/integration/accessing-private-repositories.adoc\n/workspace/modules/testing/pages/index.adoc\n/workspace/modules/testing/pages/build/snyk.adoc\n/workspace/modules/testing/pages/build/index.adoc\n/workspace/modules/testing/nav.adoc\n/workspace/modules/releasing/partials/example-manual-release.adoc\n/workspace/modules/releasing/pages/using-collectors.adoc\n/workspace/modules/releasing/pages/tenant-release-pipelines.adoc\n/workspace/modules/releasing/pages/index.adoc\n/workspace/modules/releasing/pages/create-release.adoc\n/workspace/modules/releasing/pages/create-release-plan.adoc\n/workspace/modules/releasing/pages/create-release-plan-admission.adoc\n/workspace/modules/releasing/pages/adjusting-timeouts-resources.adoc\n/workspace/modules/releasing/nav.adoc\n/workspace/modules/reference/partials/konflux-additional-sample-repositories.adoc\n/workspace/modules/reference/pages/sample-repositories.adoc\n/workspace/modules/reference/pages/kube-apis/release-service.adoc\n/workspace/modules/reference/pages/kube-apis/project-controller.adoc\n/workspace/modules/reference/pages/kube-apis/mintmaker.adoc\n/workspace/modules/reference/pages/kube-apis/integration-service.adoc\n/workspace/modules/reference/pages/kube-apis/index.adoc\n/workspace/modules/reference/pages/kube-apis/image-controller.adoc\n/workspace/modules/reference/pages/kube-apis/enterprise-contract.adoc\n/workspace/modules/reference/pages/kube-apis/application-api.adoc\n/workspace/modules/reference/pages/index.adoc\n/workspace/modules/reference/nav.adoc\n/workspace/modules/patterns/partials/konflux-submodules-source-control.adoc\n/workspace/modules/patterns/partials/konflux-submodules-renovate.adoc\n/workspace/modules/patterns/partials/konflux-submodules-example-downstream-containerfile.adoc\n/workspace/modules/patterns/partials/konflux-submodules-example-args-file.adoc\n/workspace/modules/patterns/partials/konflux-gitops-for-manual-releases-head-note.adoc\n/workspace/modules/patterns/pages/testing-releasing-single-component.adoc\n/workspace/modules/patterns/pages/slack-notifications.adoc\n/workspace/modules/patterns/pages/running-user-scripts-on-the-build-pipeline.adoc\n/workspace/modules/patterns/pages/mapping-tags-to-labels.adoc\n/workspace/modules/patterns/pages/managing-security-fix.adoc\n/workspace/modules/patterns/pages/managing-pipeline-changes.adoc\n/workspace/modules/patterns/pages/managing-multiple-versions.adoc\n/workspace/modules/patterns/pages/managing-monorepo-applications.adoc\n/workspace/modules/patterns/pages/maintaining-references-before-release.adoc\n/workspace/modules/patterns/pages/keep-remote-pipelines-up-to-date.adoc\n/workspace/modules/patterns/pages/index.adoc\n/workspace/modules/patterns/pages/gitops-for-manual-releases.adoc\n/workspace/modules/patterns/pages/github-merge-queues.adoc\n/workspace/modules/patterns/pages/git-submodules.adoc\n/workspace/modules/patterns/pages/centralize-pipeline-definitions.adoc\n/workspace/modules/patterns/nav.adoc\n/workspace/modules/mintmaker/pages/user.adoc\n/workspace/modules/mintmaker/pages/support.adoc\n/workspace/modules/mintmaker/pages/security-updates.adoc\n/workspace/modules/mintmaker/pages/rpm-lockfile.adoc\n/workspace/modules/mintmaker/pages/default-config.adoc\n/workspace/modules/mintmaker/nav.adoc\n/workspace/modules/metadata/pages/scan-results.adoc\n/workspace/modules/metadata/pages/sboms.adoc\n/workspace/modules/metadata/pages/index.adoc\n/workspace/modules/metadata/pages/discover.adoc\n/workspace/modules/metadata/pages/attestations.adoc\n/workspace/modules/metadata/nav.adoc\n/workspace/modules/installing/pages/index.adoc\n/workspace/modules/installing/pages/github-app.adoc\n/workspace/modules/installing/pages/enabling-builds.adoc\n/workspace/modules/installing/nav.adoc\n/workspace/modules/glossary/pages/index.adoc\n/workspace/modules/glossary/nav.adoc\n/workspace/modules/end-to-end/partials/konflux-nav.adoc\n/workspace/modules/end-to-end/partials/konflux-building-tekton-tasks-release-structure.adoc\n/workspace/modules/end-to-end/partials/konflux-building-tekton-tasks-prerequisites.adoc\n/workspace/modules/end-to-end/partials/konflux-building-tekton-tasks-integration.adoc\n/workspace/modules/end-to-end/pages/building-tekton-tasks.adoc\n/workspace/modules/end-to-end/pages/building-olm.adoc\n/workspace/modules/end-to-end/nav.adoc\n/workspace/modules/compliance/pages/policy-evaluations.adoc\n/workspace/modules/compliance/pages/index.adoc\n/workspace/modules/compliance/pages/customizing-policy.adoc\n/workspace/modules/compliance/nav.adoc\n/workspace/modules/building/partials/konflux-secrets-external-vault.adoc\n/workspace/modules/building/partials/konflux-releasing-considerations.adoc\n/workspace/modules/building/partials/konflux-example-prefetch-rpm-rpms_in_yaml.adoc\n/workspace/modules/building/partials/konflux-example-prefetch-rpm-lockfile.adoc\n/workspace/modules/building/partials/konflux-example-prefetch-rpm-execute.adoc\n/workspace/modules/building/partials/konflux-example-prefetch-rpm-copy-repo.adoc\n/workspace/modules/building/partials/konflux-example-prefetch-rpm-containerfile.adoc\n/workspace/modules/building/partials/konflux-example-binary-dockerfile.adoc\n/workspace/modules/building/partials/custom-resources/konflux-imagerepository.adoc\n/workspace/modules/building/partials/custom-resources/konflux-component.adoc\n/workspace/modules/building/partials/custom-resources/konflux-application.adoc\n/workspace/modules/building/pages/using-trusted-artifacts.adoc\n/workspace/modules/building/pages/running.adoc\n/workspace/modules/building/pages/redundant-rebuilds.adoc\n/workspace/modules/building/pages/reconfiguring-build-pipeline.adoc\n/workspace/modules/building/pages/prefetching-dependencies.adoc\n/workspace/modules/building/pages/overriding-compute-resources.adoc\n/workspace/modules/building/pages/labels-and-annotations.adoc\n/workspace/modules/building/pages/index.adoc\n/workspace/modules/building/pages/imagerepository.adoc\n/workspace/modules/building/pages/hermetic-builds.adoc\n/workspace/modules/building/pages/entitlement-subscription.adoc\n/workspace/modules/building/pages/deleting.adoc\n/workspace/modules/building/pages/customizing-the-build.adoc\n/workspace/modules/building/pages/custom-tags.adoc\n/workspace/modules/building/pages/creating.adoc\n/workspace/modules/building/pages/creating-secrets.adoc\n/workspace/modules/building/pages/configuration-as-code.adoc\n/workspace/modules/building/pages/component-nudges.adoc\n/workspace/modules/building/pages/build-with-args.adoc\n/workspace/modules/building/pages/build-binaries.adoc\n/workspace/modules/building/pages/activation-keys-subscription.adoc\n/workspace/modules/building/nav.adoc\n/workspace/modules/ROOT/partials/konflux-why-konflux.adoc\n/workspace/modules/ROOT/partials/konflux-nav.adoc\n/workspace/modules/ROOT/partials/konflux-key-features.adoc\n/workspace/modules/ROOT/partials/konflux-getting-started-with-the-cli.adoc\n/workspace/modules/ROOT/partials/konflux-additional-getting-started.adoc\n/workspace/modules/ROOT/pages/index.adoc\n/workspace/modules/ROOT/pages/getting-started.adoc\n/workspace/modules/ROOT/nav.adoc\n/workspace/api-gen/crd-ref-docs.yaml\n/workspace/antora.yml\n/workspace/antora-playbook.yml\n/workspace/antora-lunr-ui/ui.yml\n/workspace/antora-lunr-ui/font-awesome-4.7.0/HELP-US-OUT.txt\n/workspace/README.md\n/workspace/CONTRIBUTING.md\n/workspace/.vale/styles/config/vocabularies/konflux/accept.txt\n/workspace/.vale/styles/Konflux/VOICE_GUIDELINES.md\n/workspace/.vale/styles/Konflux/UpstreamLinks.yml\n/workspace/.vale/styles/Konflux/Imperative.yml\n/workspace/.vale/styles/Konflux/GitLinks.yml\n/workspace/.vale/styles/Konflux/DirectAddress.yml\n/workspace/.vale/styles/Konflux/ConsistentTense.yml\n/workspace/.vale/styles/Konflux/ActiveVoice.yml\n/workspace/.github/workflows/stale.yml\n/workspace/.github/workflows/publish.yaml\n/workspace/.github/workflows/preview.yaml\n/workspace/.github/workflows/linters.yaml\n/workspace/.github/workflows/checks.yaml\n/workspace/.github/dependabot.yml\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Good! There are many documentation files. Let me filter out the files that aren't relevant (excluding .forge, .github, config files like antora.yml, etc.):\n\n### Step 3: Build the identifier checklist\n\nFrom the code diff, I'll extract identifiers from the modified file `api/v1alpha1/releaseplan_types.go`:\n\n**Identifiers from the diff:**\n- `ReleaseGracePeriodDays` (removed field name)\n- `releaseGracePeriodDays` (JSON tag)\n- `RetentionDays` (new field name)\n- `retentionDays` (JSON tag)\n- `NotificationRecipients` (new field)\n- `notificationRecipients` (JSON tag)\n- `RequireApproval` (new field)\n- `requireApproval` (JSON tag)\n- `ReleasePlanSpec` (struct name)\n- Default value change from `7` to `14`\n\n### Step 4: Search docs for every identifier",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_013dYkJPkVfMbrSmaDajZQYK",
+          "caller": null,
+          "input": {
+            "command": "for id in \"ReleaseGracePeriodDays\" \"releaseGracePeriodDays\" \"RetentionDays\" \"retentionDays\" \"NotificationRecipients\" \"notificationRecipients\" \"RequireApproval\" \"requireApproval\" \"ReleasePlanSpec\" \"ReleasePlan\"; do\n  matches=$(grep -rlFi \"$id\" /workspace/modules /workspace/README.md /workspace/CONTRIBUTING.md 2>/dev/null)\n  if [ -n \"$matches\" ]; then\n    echo \"MATCH: $id -> $matches\"\n  fi\ndone"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "for id in \"ReleaseGracePeriodDays\" \"releaseGracePeriodDays\" \"RetentionDays\" \"retentionDays\" \"NotificationRecipients\" \"notificationRecipients\" \"RequireApproval\" \"requireApproval\" \"ReleasePlanSpec\" \"ReleasePlan\"; do\n  matches=$(grep -rlFi \"$id\" /workspace/modules /workspace/README.md /workspace/CONTRIBUTING.md 2>/dev/null)\n  if [ -n \"$matches\" ]; then\n    echo \"MATCH: $id -> $matches\"\n  fi\ndone"
+          },
+          "id": "toolu_vrtx_013dYkJPkVfMbrSmaDajZQYK",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "MATCH: ReleaseGracePeriodDays -> /workspace/modules/testing/pages/integration/snapshots/index.adoc\n/workspace/modules/releasing/pages/create-release-plan.adoc\n/workspace/modules/reference/pages/kube-apis/release-service.adoc\nMATCH: releaseGracePeriodDays -> /workspace/modules/testing/pages/integration/snapshots/index.adoc\n/workspace/modules/releasing/pages/create-release-plan.adoc\n/workspace/modules/reference/pages/kube-apis/release-service.adoc\nMATCH: ReleasePlanSpec -> /workspace/modules/reference/pages/kube-apis/release-service.adoc\nMATCH: ReleasePlan -> /workspace/modules/testing/pages/integration/snapshots/index.adoc\n/workspace/modules/releasing/partials/example-manual-release.adoc\n/workspace/modules/releasing/pages/using-collectors.adoc\n/workspace/modules/releasing/pages/tenant-release-pipelines.adoc\n/workspace/modules/releasing/pages/index.adoc\n/workspace/modules/releasing/pages/create-release.adoc\n/workspace/modules/releasing/pages/create-release-plan.adoc\n/workspace/modules/releasing/pages/create-release-plan-admission.adoc\n/workspace/modules/releasing/pages/adjusting-timeouts-resources.adoc\n/workspace/modules/reference/pages/kube-apis/release-service.adoc\n/workspace/modules/reference/pages/kube-apis/index.adoc\n/workspace/modules/reference/nav.adoc\n/workspace/modules/patterns/pages/testing-releasing-single-component.adoc\n/workspace/modules/patterns/pages/managing-multiple-versions.adoc\n/workspace/modules/patterns/pages/maintaining-references-before-release.adoc\n/workspace/modules/patterns/pages/gitops-for-manual-releases.adoc\n/workspace/modules/glossary/pages/index.adoc\n/workspace/modules/end-to-end/pages/building-tekton-tasks.adoc\n/workspace/modules/compliance/pages/policy-evaluations.adoc\n/workspace/modules/compliance/pages/customizing-policy.adoc\n/workspace/modules/building/pages/component-nudges.adoc\n/workspace/modules/ROOT/pages/getting-started.adoc\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Excellent! I found matches for the old field name. Let me collect the unique candidate files:\n\n**Candidate files:**\n1. `/workspace/modules/testing/pages/integration/snapshots/index.adoc` - mentions ReleaseGracePeriodDays, releaseGracePeriodDays\n2. `/workspace/modules/releasing/pages/create-release-plan.adoc` - mentions ReleaseGracePeriodDays, releaseGracePeriodDays\n3. `/workspace/modules/reference/pages/kube-apis/release-service.adoc` - mentions ReleaseGracePeriodDays, releaseGracePeriodDays, ReleasePlanSpec\n\n### Step 5: Evaluate candidates (Pass 1 - Quick scan)",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01WLWrcNpYPqDrcps3LZmxa9",
+          "caller": null,
+          "input": {
+            "command": "grep -n -i \"releasegraceperioddays\\|releaseGracePeriodDays\" /workspace/modules/testing/pages/integration/snapshots/index.adoc"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        },
+        {
+          "id": "toolu_vrtx_01Rby3f7sDfRpzkhkDUYGydM",
+          "caller": null,
+          "input": {
+            "command": "grep -n -i \"releasegraceperioddays\\|releaseGracePeriodDays\" /workspace/modules/releasing/pages/create-release-plan.adoc"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        },
+        {
+          "id": "toolu_vrtx_01VXeBkVWL1iVxznCjSejuVq",
+          "caller": null,
+          "input": {
+            "command": "grep -n -i \"releasegraceperioddays\\|releaseGracePeriodDays\\|retentiondays\" /workspace/modules/reference/pages/kube-apis/release-service.adoc"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "grep -n -i \"releasegraceperioddays\\|releaseGracePeriodDays\" /workspace/modules/testing/pages/integration/snapshots/index.adoc"
+          },
+          "id": "toolu_vrtx_01WLWrcNpYPqDrcps3LZmxa9",
+          "type": "tool_call"
+        },
+        {
+          "name": "execute",
+          "args": {
+            "command": "grep -n -i \"releasegraceperioddays\\|releaseGracePeriodDays\" /workspace/modules/releasing/pages/create-release-plan.adoc"
+          },
+          "id": "toolu_vrtx_01Rby3f7sDfRpzkhkDUYGydM",
+          "type": "tool_call"
+        },
+        {
+          "name": "execute",
+          "args": {
+            "command": "grep -n -i \"releasegraceperioddays\\|releaseGracePeriodDays\\|retentiondays\" /workspace/modules/reference/pages/kube-apis/release-service.adoc"
+          },
+          "id": "toolu_vrtx_01VXeBkVWL1iVxznCjSejuVq",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "96:**Configure the Grace Period**: Ensure the releaseGracePeriodDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter grace period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.\n104:* `Release` CRs have their own time-based expiration, defined by the `releaseGracePeriodDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **7 days**). This *is* configurable per `ReleasePlan`.\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "tool",
+      "content": "38: releaseGracePeriodDays: <days> <.>\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "tool",
+      "content": "461:| *`releaseGracePeriodDays`* __integer__ | ReleaseGracePeriodDays is the number of days a Release should be kept +\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "**Pass 1 verdicts:**\n- `/workspace/modules/testing/pages/integration/snapshots/index.adoc` \u2192 **possibly stale** (describes the old field name and default value of 7 days)\n- `/workspace/modules/releasing/pages/create-release-plan.adoc` \u2192 **possibly stale** (shows the old field name in an example)\n- `/workspace/modules/reference/pages/kube-apis/release-service.adoc` \u2192 **possibly stale** (API reference showing the old field name)\n\n### Step 5: Pass 2 - Deep read",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_019QRUgUSxTynMbAP1iDX3ji",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/testing/pages/integration/snapshots/index.adoc"
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        },
+        {
+          "id": "toolu_vrtx_01DNxnBGreRw6GiVPcuSbzHB",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/releasing/pages/create-release-plan.adoc"
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        },
+        {
+          "id": "toolu_vrtx_016YfmF7HwR6B1HG7wWci7YN",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/reference/pages/kube-apis/release-service.adoc",
+            "limit": 500
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/modules/testing/pages/integration/snapshots/index.adoc"
+          },
+          "id": "toolu_vrtx_019QRUgUSxTynMbAP1iDX3ji",
+          "type": "tool_call"
+        },
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/modules/releasing/pages/create-release-plan.adoc"
+          },
+          "id": "toolu_vrtx_01DNxnBGreRw6GiVPcuSbzHB",
+          "type": "tool_call"
+        },
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/modules/reference/pages/kube-apis/release-service.adoc",
+            "limit": 500
+          },
+          "id": "toolu_vrtx_016YfmF7HwR6B1HG7wWci7YN",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "     1\t= Snapshots\n     2\t\n     3\t// Optional: Define context for cross-references if needed within the module structure\n     4\t// :context: snapshots\n     5\t\n     6\tA {ProductName} **Snapshot** represents a specific, immutable collection of container images for the Components within an Application at a particular point in time. They capture the exact versions of all relevant component artifacts that were built and intended to be used together including their Git commits. Once created, the list of Components with their images is immutable. \n     7\t\n     8\tSnapshots are fundamental for ensuring consistency during testing and release processes. They provide a stable target for:\n     9\t\n    10\t* Running integration tests defined by IntegrationTestScenarios (ITS). The Integration service updates the status of the resources to reflect the testing outcomes.\n    11\t* Creating Releases using ReleasePlans to promote a specific set of component versions to different environments (like staging or production).\n    12\t\n    13\t== Example Snapshot\n    14\t\n    15\tExample Snapshot resource contents::\n    16\t[source]\n    17\t----\n    18\tapiVersion: appstudio.redhat.com/v1alpha1\n    19\tkind: Snapshot\n    20\tmetadata:\n    21\t  name: snapshot-sample <.>\n    22\t  namespace: ws-sample-tenant <.>\n    23\tspec:\n    24\t  application: application-sample <.>\n    25\t  components:\n    26\t    - name: component-sample <.>\n    27\t      containerImage: quay.io/redhat-user-workloads/ws-sample-tenant/application-sample/component-sample@sha256:0db0a473a6abf5c15c424ab07cfbd5c40c06622fe648d4fe6a6b6abc224a0d0c <.>\n    28\t      source: <.>\n    29\t        git:\n    30\t          url: https://github.com/sample-org/sample-repo\n    31\t          revision: fa8b89274a61ef0f1c257b7a84c37aa2ec844109\n    32\t----\n    33\t<.> The name of the Snapshot resource.\n    34\t<.> The namespace where the Snapshot exists. It should correspond to the user's tenant namespace.\n    35\t<.> The Application that the Snapshot belongs to.\n    36\t<.> The name of the individual Component of the Application.\n    37\t<.> The full image pull specification for the container image. The images need to be referenced by digest.\n    38\t<.> The component source containing the git URL and revision that the component's container image was built from.\n    39\t\n    40\t== Snapshot Creation\n    41\t\n    42\tSnapshots can be generated in several ways:\n    43\t\n    44\t* **Automatic (Push Events):** This is the primary mechanism for generating snapshots intended for release pipelines.\n    45\t** When code is pushed to a branch tracked by your Components (e.g., `main`, `release-4.19`), {ProductName} triggers the associated build pipelines defined in the `.tekton/` directory of your component repositories.\n    46\t** Once the build is complete, a Snapshot CR is automatically created. It contains references to the container image digest produced by that successful build along with the latest images for all other Components in the Application.\n    47\t** These push-event snapshots are typically labeled with `pac.test.appstudio.openshift.io/event-type=push`.\n    48\t** They may be used for xref:releasing:create-release.adoc[creating a release].\n    49\t\n    50\t* **Automatic (Pull Request Events):** Snapshots are also generated for Pull Requests (PRs) to enable automated testing of proposed changes.\n    51\t** Once a pull or merge request build is complete, a Snapshot CR is automatically created. It contains references to the container image digest produced by that successful build along with the latest push images for all other Components in the Application.\n    52\t** These pull request-event snapshots are typically labeled with `pac.test.appstudio.openshift.io/event-type=pull_request`.\n    53\t** These snapshots might be created incrementally constructed as individual component builds finish within the PR context (i.e. xref:testing:integration/snapshots/group-snapshots.adoc[group snapshots]). These group snapshots are often annotated with `test.appstudio.openshift.io/pr-group`.\n    54\t** Pull request Snapshots are subject to more aggressive garbage collection policies (see below).\n    55\t** They are primarily intended for pre-merge testing and usually not used for formal releases.\n    56\t\n    57\t* **Manual:** You can xref:testing:integration/snapshots/working-with-snapshots.adoc#manual-snapshots[manually create] a Snapshot custom resource (CR) if needed. This allows you to define a specific combination of existing component container images (e.g., previously built images stored in `quay.io`) for testing or release purposes. This is useful for scenarios like promoting a specific known-good set of images to production when automatic releases are disabled.\n    58\t\n    59\t== Quotas and Garbage Collection\n    60\t\n    61\tUnderstanding how Snapshots are managed and limited within {ProductName} is essential to avoid unexpected behavior:\n    62\t\n    63\t=== Snapshot Quota\n    64\t\n    65\t* There is a resource quota limiting the total number of Snapshot CRs that can exist within a single tenant namespace.\n    66\t* The default quota is **1024 Snapshots** (`count/snapshots.appstudio.redhat.com`).\n    67\t\n    68\t[IMPORTANT]\n    69\t====\n    70\tThis quota is **not user-configurable**. If you anticipate exceeding this limit due to a large number of applications or frequent builds across many supported versions, you may need to contact the {ProductName} administrators to request a quota increase for your namespace.\n    71\t\n    72\tMonitor usage via `kubectl get quota appstudio-crds-integration -o yaml`.\n    73\t====\n    74\t\n    75\t=== Snapshot Garbage Collection (GC)\n    76\t\n    77\tSnapshot CRs themselves consume resources. To manage this and stay within quota, {ProductName} implements automated garbage collection:\n    78\t\n    79\t* **Eligibility:** GC applies to Snapshots that are **not** referenced by an active `Release` CR.\n    80\t* **Mechanism:** GC is based on **retention counts**, not age. {ProductName} keeps a specific number of the most recent unreferenced snapshots and deletes the oldest ones beyond that limit.\n    81\t** Default retention counts:\n    82\t*** **~=500** non-PR (push event) snapshots.\n    83\t*** **70** PR event snapshots.\n    84\t* **Exception:** Snapshots annotated with `test.appstudio.openshift.io/keep-snapshot=true` will not be garbage collected\n    85\t\n    86\tIMPORTANT: These retention counts are **not user-configurable**.\n    87\t\n    88\t[NOTE]\n    89\t====\n    90\tIt's possible to encounter a situation where new Snapshots cannot be created because the namespace has reached its 1024 Snapshot quota, even though the garbage collector (GC) is not pruning anything.\n    91\t\n    92\t**Cause**: This deadlock occurs when a large number of Snapshot CRs are protected from count-based GC by active Release CRs. While these Snapshots are protected, they still count towards the global quota. If the number of unreferenced Snapshots is below the retention limits (~500 push, 70 PR), the GC will not clear anything, but the total number of Snapshots (referenced + unreferenced) can still exceed 1024, blocking new snapshot creation.\n    93\t\n    94\t**Mitigation**: The primary way to prevent this is to manage the lifecycle of your Release CRs.\n    95\t\n    96\t**Configure the Grace Period**: Ensure the releaseGracePeriodDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter grace period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.\n    97\t\n    98\t**Manual Deletion**: In an urgent situation, you can manually delete old or unnecessary Release CRs to immediately make their Snapshots eligible for GC. \n    99\t====\n   100\t",
+      "tool_calls": null
+    },
+    {
+      "role": "tool",
+      "content": "     1\t= Creating a release plan\n     2\t\n     3\tA ReleasePlan (RP) CR is created for a specific Application. It defines the the process to release a specific Application Snapshot in a target tenant namespace, whether automatic releases are enabled, as well as additional data to pass to a corresponding RPA.\n     4\t\n     5\t== Creating a `ReleasePlan` object\n     6\t\n     7\tThe development team creates a `ReleasePlan` object in the developer tenant namespace. The `ReleasePlan` object includes a reference to the application that the development team wants to release, along with tenant namespace where the application is supposed to be released.\n     8\t\n     9\t.*Prerequisites*\n    10\t\n    11\t* You have an existing Development tenant namespace.\n    12\t* You have completed the steps listed in the xref:ROOT:getting-started.adoc#getting-started-with-the-cli[Getting started in the CLI] page.\n    13\t\n    14\t.*Procedures*\n    15\t\n    16\t. Create a `ReleasePlan.yaml` object locally.\n    17\t\n    18\t+\n    19\t*Example `ReleasePlan.yaml` object*\n    20\t\n    21\t+\n    22\t[source,yaml]\n    23\t----\n    24\tapiVersion: appstudio.redhat.com/v1alpha1\n    25\tkind: ReleasePlan\n    26\tmetadata:\n    27\t labels:\n    28\t   release.appstudio.openshift.io/auto-release: 'true' <.>\n    29\t   release.appstudio.openshift.io/standing-attribution: 'true'\n    30\t   release.appstudio.openshift.io/releasePlanAdmission: 'rpa-name' <.>\n    31\t name: sre-production <.>\n    32\t namespace: dev-tenant-namespace <.>\n    33\tspec:\n    34\t application: <application-name> <.>\n    35\t data: <key> <.>\n    36\t pipelineRef: <pipeline-ref> <.>\n    37\t serviceAccount: <service-account> <.>\n    38\t releaseGracePeriodDays: <days> <.>\n    39\t target: managed-tenant-namespace <.>\n    40\t----\n    41\t\n    42\t+\n    43\t<.> Optional: Control if Releases should be created automatically for this ReleasePlan when tests pass. Defaults to true.\n    44\t<.> Optional: The name of the RPA to use if more than one RPA references the specified application.\n    45\t<.> The name of the release plan.\n    46\t<.> The development team's tenant namespace.\n    47\t<.> The name of the application that you want to deploy to the managed tenant namespace.\n    48\t<.> Optional: An unstructured key used for providing data for the managed Pipeline.\n    49\t<.> Optional: Reference to the Pipeline to be executed by the release service.\n    50\t<.> Optional: The name of the service account to use in the Pipeline to gain elevated privileges. It's used only if you have defined the `pipelineRef` value.\n    51\t<.> Optional: The number of days a Release should be kept before being garbage collected. (default is 7 days)\n    52\t<.> The tenant namespace to which the system deploys the application. This tenant namespace is created by the Managed environment team (for example, your organization's SRE team)\n    53\t\n    54\t. In the development tenant namespace, apply the `ReleasePlan.yaml` file and add the resource to your cluster by running the following command:\n    55\t\n    56\t+\n    57\t[source,shell]\n    58\t----\n    59\t$ kubectl apply -f ReleasePlan.yaml -n dev\n    60\t----\n    61\t\n    62\t.*Verification*\n    63\t\n    64\t. In the {ProductName} UI, select the *Release services* > *Release plan* tab.\n    65\t. Review the Release plan object that you just added. Using the Release plan tab, you can update or delete the selected Release plan object.\n    66\t. When a ReleasePlan is correctly configured to be paired with a ReleasePlanAdmission, its *Status* will display as being `Matched`.",
+      "tool_calls": null
+    },
+    {
+      "role": "tool",
+      "content": "     1\t// Generated documentation. Please do not edit.\n     2\t:anchor_prefix: k8s-api\n     3\t\n     4\t[id=\"reference\"]\n     5\t== Release API Reference\n     6\t\n     7\t.Packages\n     8\t- xref:{anchor_prefix}-appstudio-redhat-com-v1alpha1[$$appstudio.redhat.com/v1alpha1$$]\n     9\t\n    10\t\n    11\t[id=\"{anchor_prefix}-appstudio-redhat-com-v1alpha1\"]\n    12\t=== appstudio.redhat.com/v1alpha1\n    13\t\n    14\tPackage v1alpha1 contains API Schema definitions for the appstudio v1alpha1 API group\n    15\t\n    16\t.Resource Types\n    17\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-release[$$Release$$]\n    18\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaselist[$$ReleaseList$$]\n    19\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplan[$$ReleasePlan$$]\n    20\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmission[$$ReleasePlanAdmission$$]\n    21\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionlist[$$ReleasePlanAdmissionList$$]\n    22\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanlist[$$ReleasePlanList$$]\n    23\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfig[$$ReleaseServiceConfig$$]\n    24\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfiglist[$$ReleaseServiceConfigList$$]\n    25\t\n    26\t\n    27\t\n    28\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-attributioninfo\"]\n    29\t==== AttributionInfo\n    30\t\n    31\t\n    32\t\n    33\tAttributionInfo defines the observed state of the release attribution.\n    34\t\n    35\t\n    36\t\n    37\t.Appears In:\n    38\t****\n    39\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]\n    40\t****\n    41\t\n    42\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n    43\t|===\n    44\t| Field | Description | Default | Validation\n    45\t| *`author`* __string__ | Author is the username that the release is attributed to + |  | \n    46\t| *`standingAuthorization`* __boolean__ | StandingAuthorization indicates whether the release is attributed through a ReleasePlan + |  | \n    47\t|===\n    48\t\n    49\t\n    50\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectoritem\"]\n    51\t==== CollectorItem\n    52\t\n    53\t\n    54\t\n    55\tCollectorItem represents all the information about an specific collector which will be executed in the\n    56\tCollectorsPipeline.\n    57\t\n    58\t\n    59\t\n    60\t.Appears In:\n    61\t****\n    62\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectors[$$Collectors$$]\n    63\t****\n    64\t\n    65\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n    66\t|===\n    67\t| Field | Description | Default | Validation\n    68\t| *`name`* __string__ | Name of the collector + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n    69\t\n    70\t| *`timeout`* __integer__ | Timeout in seconds for the collector to execute + |  | \n    71\t| *`type`* __string__ | Type is the type of collector to be used + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n    72\t\n    73\t| *`params`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-param[$$Param$$] array__ | Params is a slice of parameters for a given collector + |  | \n    74\t|===\n    75\t\n    76\t\n    77\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectors\"]\n    78\t==== Collectors\n    79\t\n    80\t\n    81\t\n    82\tCollectors holds the list of collectors to be executed as part of the release workflow along with the\n    83\tServiceAccount to be used in the PipelineRun.\n    84\t\n    85\t\n    86\t\n    87\t.Appears In:\n    88\t****\n    89\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionspec[$$ReleasePlanAdmissionSpec$$]\n    90\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanspec[$$ReleasePlanSpec$$]\n    91\t****\n    92\t\n    93\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n    94\t|===\n    95\t| Field | Description | Default | Validation\n    96\t| *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectoritem[$$CollectorItem$$] array__ | Items is the list of Collectors to be executed as part of the release workflow + |  | \n    97\t| *`serviceAccountName`* __string__ | ServiceAccountName is the ServiceAccount to use during the execution of the Collectors Pipeline + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n    98\t\n    99\t|===\n   100\t\n   101\t\n   102\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectorsinfo\"]\n   103\t==== CollectorsInfo\n   104\t\n   105\t\n   106\t\n   107\tCollectorsInfo defines the observed state of the release collectors.\n   108\t\n   109\t\n   110\t\n   111\t.Appears In:\n   112\t****\n   113\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]\n   114\t****\n   115\t\n   116\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   117\t|===\n   118\t| Field | Description | Default | Validation\n   119\t| *`managedCollectorsProcessing`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelineinfo[$$PipelineInfo$$]__ | ManagedCollectorsProcessing contains information about the release managed collectors processing + |  | \n   120\t| *`tenantCollectorsProcessing`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelineinfo[$$PipelineInfo$$]__ | TenantCollectorsProcessing contains information about the release tenant collectors processing + |  | \n   121\t|===\n   122\t\n   123\t\n   124\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-emptydiroverrides\"]\n   125\t==== EmptyDirOverrides\n   126\t\n   127\t\n   128\t\n   129\tEmptyDirOverrides defines the values usually set in a PipelineRef using a git resolver.\n   130\t\n   131\t\n   132\t\n   133\t.Appears In:\n   134\t****\n   135\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfigspec[$$ReleaseServiceConfigSpec$$]\n   136\t****\n   137\t\n   138\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   139\t|===\n   140\t| Field | Description | Default | Validation\n   141\t| *`url`* __string__ | Url is the url to the git repo + |  | \n   142\t| *`revision`* __string__ | Revision is the git revision where the Pipeline definition can be found + |  | \n   143\t| *`pathInRepo`* __string__ | PathInRepo is the path within the git repository where the Pipeline definition can be found + |  | \n   144\t|===\n   145\t\n   146\t\n   147\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplan\"]\n   148\t==== MatchedReleasePlan\n   149\t\n   150\t\n   151\t\n   152\tMatchedReleasePlan defines the relevant information for a matched ReleasePlan.\n   153\t\n   154\t\n   155\t\n   156\t.Appears In:\n   157\t****\n   158\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionstatus[$$ReleasePlanAdmissionStatus$$]\n   159\t****\n   160\t\n   161\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   162\t|===\n   163\t| Field | Description | Default | Validation\n   164\t| *`name`* __string__ | Name contains the namespaced name of the ReleasePlan + |  | Pattern: `^[a-z0-9]([-a-z0-9]\\*[a-z0-9])?\\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n   165\t\n   166\t| *`active`* __boolean__ | Active indicates whether the ReleasePlan is set to auto-release or not + |  | \n   167\t|===\n   168\t\n   169\t\n   170\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplanadmission\"]\n   171\t==== MatchedReleasePlanAdmission\n   172\t\n   173\t\n   174\t\n   175\tMatchedReleasePlanAdmission defines the relevant information for a matched ReleasePlanAdmission.\n   176\t\n   177\t\n   178\t\n   179\t.Appears In:\n   180\t****\n   181\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanstatus[$$ReleasePlanStatus$$]\n   182\t****\n   183\t\n   184\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   185\t|===\n   186\t| Field | Description | Default | Validation\n   187\t| *`name`* __string__ | Name contains the namespaced name of the releasePlanAdmission + |  | \n   188\t| *`active`* __boolean__ | Active indicates whether the ReleasePlanAdmission is set to block-releases or not + |  | \n   189\t|===\n   190\t\n   191\t\n   192\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-param\"]\n   193\t==== Param\n   194\t\n   195\t\n   196\t\n   197\tParam represents a parameter for a collector\n   198\t\n   199\t\n   200\t\n   201\t.Appears In:\n   202\t****\n   203\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectoritem[$$CollectorItem$$]\n   204\t****\n   205\t\n   206\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   207\t|===\n   208\t| Field | Description | Default | Validation\n   209\t| *`name`* __string__ | Name is the name of the parameter + |  | \n   210\t| *`value`* __string__ | Value is the value of the parameter + |  | \n   211\t|===\n   212\t\n   213\t\n   214\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-pipelineinfo\"]\n   215\t==== PipelineInfo\n   216\t\n   217\t\n   218\t\n   219\tPipelineInfo defines the observed state of a release pipeline processing.\n   220\t\n   221\t\n   222\t\n   223\t.Appears In:\n   224\t****\n   225\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectorsinfo[$$CollectorsInfo$$]\n   226\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]\n   227\t****\n   228\t\n   229\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   230\t|===\n   231\t| Field | Description | Default | Validation\n   232\t| *`completionTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | CompletionTime is the time when the Release processing was completed + |  | \n   233\t| *`pipelineRun`* __string__ | PipelineRun contains the namespaced name of the managed Release PipelineRun executed as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]\\*[a-z0-9])?\\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n   234\t\n   235\t| *`roleBinding`* __string__ | RoleBinding contains the namespaced name of the roleBinding created for the managed Release PipelineRun +\n   236\texecuted as part of this release + |  | Pattern: `^[a-z0-9]([-a-z0-9]\\*[a-z0-9])?\\/[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n   237\t\n   238\t| *`startTime`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#time-v1-meta[$$Time$$]__ | StartTime is the time when the Release processing started + |  | \n   239\t|===\n   240\t\n   241\t\n   242\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-release\"]\n   243\t==== Release\n   244\t\n   245\t\n   246\t\n   247\tRelease is the Schema for the releases API\n   248\t\n   249\t\n   250\t\n   251\t.Appears In:\n   252\t****\n   253\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaselist[$$ReleaseList$$]\n   254\t****\n   255\t\n   256\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   257\t|===\n   258\t| Field | Description | Default | Validation\n   259\t| *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |\n   260\t| *`kind`* __string__ | `Release` | |\n   261\t| *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#objectmeta-v1-meta[$$ObjectMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.\n   262\t |  | \n   263\t| *`spec`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasespec[$$ReleaseSpec$$]__ |  |  | \n   264\t| *`status`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releasestatus[$$ReleaseStatus$$]__ |  |  | \n   265\t|===\n   266\t\n   267\t\n   268\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaselist\"]\n   269\t==== ReleaseList\n   270\t\n   271\t\n   272\t\n   273\tReleaseList contains a list of Release\n   274\t\n   275\t\n   276\t\n   277\t\n   278\t\n   279\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   280\t|===\n   281\t| Field | Description | Default | Validation\n   282\t| *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |\n   283\t| *`kind`* __string__ | `ReleaseList` | |\n   284\t| *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#listmeta-v1-meta[$$ListMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.\n   285\t |  | \n   286\t| *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-release[$$Release$$] array__ |  |  | \n   287\t|===\n   288\t\n   289\t\n   290\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplan\"]\n   291\t==== ReleasePlan\n   292\t\n   293\t\n   294\t\n   295\tReleasePlan is the Schema for the ReleasePlans API.\n   296\t\n   297\t\n   298\t\n   299\t.Appears In:\n   300\t****\n   301\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanlist[$$ReleasePlanList$$]\n   302\t****\n   303\t\n   304\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   305\t|===\n   306\t| Field | Description | Default | Validation\n   307\t| *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |\n   308\t| *`kind`* __string__ | `ReleasePlan` | |\n   309\t| *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#objectmeta-v1-meta[$$ObjectMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.\n   310\t |  | \n   311\t| *`spec`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanspec[$$ReleasePlanSpec$$]__ |  |  | \n   312\t| *`status`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanstatus[$$ReleasePlanStatus$$]__ |  |  | \n   313\t|===\n   314\t\n   315\t\n   316\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmission\"]\n   317\t==== ReleasePlanAdmission\n   318\t\n   319\t\n   320\t\n   321\tReleasePlanAdmission is the Schema for the ReleasePlanAdmissions API.\n   322\t\n   323\t\n   324\t\n   325\t.Appears In:\n   326\t****\n   327\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionlist[$$ReleasePlanAdmissionList$$]\n   328\t****\n   329\t\n   330\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   331\t|===\n   332\t| Field | Description | Default | Validation\n   333\t| *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |\n   334\t| *`kind`* __string__ | `ReleasePlanAdmission` | |\n   335\t| *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#objectmeta-v1-meta[$$ObjectMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.\n   336\t |  | \n   337\t| *`spec`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionspec[$$ReleasePlanAdmissionSpec$$]__ |  |  | \n   338\t| *`status`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionstatus[$$ReleasePlanAdmissionStatus$$]__ |  |  | \n   339\t|===\n   340\t\n   341\t\n   342\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionlist\"]\n   343\t==== ReleasePlanAdmissionList\n   344\t\n   345\t\n   346\t\n   347\tReleasePlanAdmissionList contains a list of ReleasePlanAdmission.\n   348\t\n   349\t\n   350\t\n   351\t\n   352\t\n   353\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   354\t|===\n   355\t| Field | Description | Default | Validation\n   356\t| *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |\n   357\t| *`kind`* __string__ | `ReleasePlanAdmissionList` | |\n   358\t| *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#listmeta-v1-meta[$$ListMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.\n   359\t |  | \n   360\t| *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmission[$$ReleasePlanAdmission$$] array__ |  |  | \n   361\t|===\n   362\t\n   363\t\n   364\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionspec\"]\n   365\t==== ReleasePlanAdmissionSpec\n   366\t\n   367\t\n   368\t\n   369\tReleasePlanAdmissionSpec defines the desired state of ReleasePlanAdmission.\n   370\t\n   371\t\n   372\t\n   373\t.Appears In:\n   374\t****\n   375\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmission[$$ReleasePlanAdmission$$]\n   376\t****\n   377\t\n   378\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   379\t|===\n   380\t| Field | Description | Default | Validation\n   381\t| *`applications`* __string array__ | Applications is a list of references to applications to be released in the managed namespace + |  | \n   382\t| *`collectors`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectors[$$Collectors$$]__ | Collectors contains all the information of the collectors to be executed as part of the release workflow + |  | \n   383\t| *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the managed Release Pipeline + |  | \n   384\t| *`environment`* __string__ | Environment defines which Environment will be used to release the Application + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n   385\t\n   386\t| *`origin`* __string__ | Origin references where the release requests should come from + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n   387\t\n   388\t| *`pipeline`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-pipeline[$$Pipeline$$]__ | Pipeline contains all the information about the managed Pipeline + |  | \n   389\t| *`policy`* __string__ | Policy to validate before releasing an artifact + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n   390\t\n   391\t|===\n   392\t\n   393\t\n   394\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmissionstatus\"]\n   395\t==== ReleasePlanAdmissionStatus\n   396\t\n   397\t\n   398\t\n   399\tReleasePlanAdmissionStatus defines the observed state of ReleasePlanAdmission.\n   400\t\n   401\t\n   402\t\n   403\t.Appears In:\n   404\t****\n   405\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanadmission[$$ReleasePlanAdmission$$]\n   406\t****\n   407\t\n   408\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   409\t|===\n   410\t| Field | Description | Default | Validation\n   411\t| *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the releasePlanAdmission + |  | \n   412\t| *`releasePlans`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplan[$$MatchedReleasePlan$$] array__ | ReleasePlan is a list of releasePlans matched to the ReleasePlanAdmission + |  | \n   413\t|===\n   414\t\n   415\t\n   416\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanlist\"]\n   417\t==== ReleasePlanList\n   418\t\n   419\t\n   420\t\n   421\tReleasePlanList contains a list of ReleasePlan.\n   422\t\n   423\t\n   424\t\n   425\t\n   426\t\n   427\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   428\t|===\n   429\t| Field | Description | Default | Validation\n   430\t| *`apiVersion`* __string__ | `appstudio.redhat.com/v1alpha1` | |\n   431\t| *`kind`* __string__ | `ReleasePlanList` | |\n   432\t| *`metadata`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#listmeta-v1-meta[$$ListMeta$$]__ | Refer to Kubernetes API documentation for fields of `metadata`.\n   433\t |  | \n   434\t| *`items`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplan[$$ReleasePlan$$] array__ |  |  | \n   435\t|===\n   436\t\n   437\t\n   438\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanspec\"]\n   439\t==== ReleasePlanSpec\n   440\t\n   441\t\n   442\t\n   443\tReleasePlanSpec defines the desired state of ReleasePlan.\n   444\t\n   445\t\n   446\t\n   447\t.Appears In:\n   448\t****\n   449\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplan[$$ReleasePlan$$]\n   450\t****\n   451\t\n   452\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   453\t|===\n   454\t| Field | Description | Default | Validation\n   455\t| *`application`* __string__ | Application is a reference to the application to be released in the managed namespace + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n   456\t\n   457\t| *`collectors`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-collectors[$$Collectors$$]__ | Collectors contains all the information of the collectors to be executed as part of the release workflow + |  | \n   458\t| *`data`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#rawextension-runtime-pkg[$$RawExtension$$]__ | Data is an unstructured key used for providing data for the managed Release Pipeline + |  | \n   459\t| *`tenantPipeline`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-parameterizedpipeline[$$ParameterizedPipeline$$]__ | TenantPipeline contains all the information about the tenant Pipeline + |  | \n   460\t| *`finalPipeline`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-tekton-utils-parameterizedpipeline[$$ParameterizedPipeline$$]__ | FinalPipeline contains all the information about the final Pipeline + |  | \n   461\t| *`releaseGracePeriodDays`* __integer__ | ReleaseGracePeriodDays is the number of days a Release should be kept +\n   462\tThis value is used to define the Release ExpirationTime + | 7 | \n   463\t| *`target`* __string__ | Target references where to send the release requests + |  | Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` +\n   464\t\n   465\t|===\n   466\t\n   467\t\n   468\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplanstatus\"]\n   469\t==== ReleasePlanStatus\n   470\t\n   471\t\n   472\t\n   473\tReleasePlanStatus defines the observed state of ReleasePlan.\n   474\t\n   475\t\n   476\t\n   477\t.Appears In:\n   478\t****\n   479\t- xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseplan[$$ReleasePlan$$]\n   480\t****\n   481\t\n   482\t[cols=\"20a,50a,15a,15a\", options=\"header\"]\n   483\t|===\n   484\t| Field | Description | Default | Validation\n   485\t| *`conditions`* __link:https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.3/#condition-v1-meta[$$Condition$$] array__ | Conditions represent the latest available observations for the releasePlan + |  | \n   486\t| *`releasePlanAdmission`* __xref:{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-matchedreleaseplanadmission[$$MatchedReleasePlanAdmission$$]__ | ReleasePlanAdmission contains the information of the releasePlanAdmission this ReleasePlan is +\n   487\tmatched to + |  | \n   488\t|===\n   489\t\n   490\t\n   491\t[id=\"{anchor_prefix}-github-com-konflux-ci-release-service-api-v1alpha1-releaseserviceconfig\"]\n   492\t==== ReleaseServiceConfig\n   493\t\n   494\t\n   495\t\n   496\tReleaseServiceConfig is the Schema for the releaseserviceconfigs API\n   497\t\n   498\t\n   499\t\n   500\t.Appears In:",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Let me continue reading the API reference file to see if there are new fields missing:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01KqoqMSmnZtc7XKXEd3dboq",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/testing/pages/integration/snapshots/index.adoc",
+            "offset": 100,
+            "limit": 20
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/modules/testing/pages/integration/snapshots/index.adoc",
+            "offset": 100,
+            "limit": 20
+          },
+          "id": "toolu_vrtx_01KqoqMSmnZtc7XKXEd3dboq",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "   101\t=== Relationship with Releases\n   102\t\n   103\t* When you create a `Release` CR from a Snapshot, that Snapshot is protected from the count-based garbage collection described above *if the Release exists*.\n   104\t* `Release` CRs have their own time-based expiration, defined by the `releaseGracePeriodDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **7 days**). This *is* configurable per `ReleasePlan`.\n   105\t* When a `Release` CR expires, it is automatically deleted.\n   106\t* Once the `Release` is deleted, its associated `Snapshot` CR is no longer protected and becomes eligible for count-based garbage collection if the retention limits are exceeded.\n   107\t\n   108\t[NOTE]\n   109\t====\n   110\tThe garbage collection of `Snapshot` and `Release` CRs does **not** automatically delete the underlying container images that were pushed to registries.\n   111\t\n   112\t* Images pushed to `quay.io` during **PR builds** typically expire automatically (default: 5 days, configurable in the pipeline with the `image-expires-after` parameter).\n   113\t* Images pushed to `quay.io` during **push builds** do **not** expire automatically but *will* be deleted if the corresponding `Component` CR is deleted (unless repository deletion is xref:building:imagerepository.adoc#skip-repository-deletion[explicitly skipped]).\n   114\t* Images promoted to external registries via a release pipeline are **not** deleted by {ProductName} GC.\n   115\t====\n   116\t\n   117\t== Understanding Incomplete Snapshots\n   118\t\n   119\tA common point of confusion occurs when a Snapshot contains fewer components than expected (e.g., only 1 out of 5 components in an Application).\n   120\t",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Perfect! Now I have a clear picture. Let me confirm the stale docs:\n\n**Confirmed stale files:**\n1. `/workspace/modules/testing/pages/integration/snapshots/index.adoc` - Lines 96, 104 mention `releaseGracePeriodDays` with default of 7 days\n2. `/workspace/modules/releasing/pages/create-release-plan.adoc` - Line 38 shows field in example, Line 51 describes it with default of 7 days\n3. `/workspace/modules/reference/pages/kube-apis/release-service.adoc` - Line 461-462 shows the old field name and old default value\n\n### Step 6: Review beyond grep results\n\nLet me check the main README and releasing index:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01PtRHDcMY7GPyrT1PjLr8Lz",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/README.md"
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        },
+        {
+          "id": "toolu_vrtx_01FdjJuCfNRG5jN427c5eTdr",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/releasing/pages/index.adoc"
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/README.md"
+          },
+          "id": "toolu_vrtx_01PtRHDcMY7GPyrT1PjLr8Lz",
+          "type": "tool_call"
+        },
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/modules/releasing/pages/index.adoc"
+          },
+          "id": "toolu_vrtx_01FdjJuCfNRG5jN427c5eTdr",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "     1\t# docs\n     2\tKonflux-ci documentation",
+      "tool_calls": null
+    },
+    {
+      "role": "tool",
+      "content": "     1\t= Releasing an application\n     2\t:icons: font\n     3\t:numbered:\n     4\t:source-highlighter: highlightjs\n     5\t\n     6\tThe process of developing software rarely happens entirely within a single team. Especially within large organizations, different teams may be building and deploying applications. In these situations, the team managing the deployments (for example, Site Reliability Engineers) will want to automate the process of accepting content for release, validating that certain conditions are met, and then performing the release action\u2014all while maintaining control of their pipelines and secrets. In {ProductName}, we call this process releasing an application.\n     7\t\n     8\tTwo teams work together to release an application:\n     9\t\n    10\t* *Development team* - The team that develops and supports the application. This may include testing or deploying it in a pre-production environment.\n    11\t\n    12\t* *Managed environment team* - The team that maintains control of the process and secrets for performing a specific action (for example, deploying an application to a production environment).\n    13\t\n    14\t.Procedure\n    15\t\n    16\t. When an application is ready for release, the Development team contacts the Managed Environment team (for example, their organization's SRE team) requesting access to the managed environment for the first production release. \n    17\t\n    18\t. The development and managed environment teams will work together to create a ReleasePlanAdmission (RPA) in the managed environment to specify the release pipeline to run containing the appropriate tasks to release the application.\n    19\t\n    20\t. The development team creates a matching ReleasePlan (RP) configuration in their environment, which is same as that of the Managed environment, and attempts to release the application to production.\n    21\t\n    22\t.Next steps\n    23\t\n    24\t* *Create a `releasePlan` object:* The development team creates a ReleasePlan object in the developer tenant namespace. The ReleasePlan object includes a reference to the application that the development team wants to release, along with tenant namespace where the application is supposed to be released.\n    25\t\n    26\t* *Create a `releasePlanAdmission` object:* The Managed Environment team creates or updates the ReleasePlanAdmission object in response to the ReleasePlan object created by the development team. It indicates that the Managed Environment team has approved the application specified in the ReleasePlan object.\n    27\t\n    28\t* *Create a `release` object:* The development team creates a Release object to reference a specific Snapshot and ReleasePlan. It indicates the users' intent to operate on the Snapshot with the matched ReleasePlanAdmission.",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "The index file doesn't mention the specific fields. Let me also check if there's any mention of the new fields that were added (`NotificationRecipients` and `RequireApproval`). Since these are brand new fields, they won't be in the docs, so I don't need to update docs to mention them unless there's a comprehensive API reference.\n\nThe API reference file `/workspace/modules/reference/pages/kube-apis/release-service.adoc` appears to be auto-generated (line 1 says \"Generated documentation. Please do not edit.\"), so I should skip updating it per the skill instructions.\n\nLet me verify this is auto-generated:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_013nFCMhaRiDcPQwXQP2Hk2V",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/reference/pages/kube-apis/release-service.adoc",
+            "limit": 10
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/modules/reference/pages/kube-apis/release-service.adoc",
+            "limit": 10
+          },
+          "id": "toolu_vrtx_013nFCMhaRiDcPQwXQP2Hk2V",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "     1\t// Generated documentation. Please do not edit.\n     2\t:anchor_prefix: k8s-api\n     3\t\n     4\t[id=\"reference\"]\n     5\t== Release API Reference\n     6\t\n     7\t.Packages\n     8\t- xref:{anchor_prefix}-appstudio-redhat-com-v1alpha1[$$appstudio.redhat.com/v1alpha1$$]\n     9\t\n    10\t",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Yes, it's auto-generated. I should NOT manually edit it. The files to update are:\n\n1. `/workspace/modules/testing/pages/integration/snapshots/index.adoc`\n2. `/workspace/modules/releasing/pages/create-release-plan.adoc`\n\n### Step 7: Update confirmed stale docs",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01TnCsidt4uusMe2FKe835v4",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/testing/pages/integration/snapshots/index.adoc",
+            "old_string": "**Configure the Grace Period**: Ensure the releaseGracePeriodDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter grace period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.",
+            "new_string": "**Configure the Retention Period**: Ensure the retentionDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter retention period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection."
+          },
+          "name": "edit_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "edit_file",
+          "args": {
+            "file_path": "/workspace/modules/testing/pages/integration/snapshots/index.adoc",
+            "old_string": "**Configure the Grace Period**: Ensure the releaseGracePeriodDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter grace period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.",
+            "new_string": "**Configure the Retention Period**: Ensure the retentionDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter retention period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection."
+          },
+          "id": "toolu_vrtx_01TnCsidt4uusMe2FKe835v4",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "Successfully replaced 1 instance(s) of the string in '/workspace/modules/testing/pages/integration/snapshots/index.adoc'",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_01D7kiwmArWyzur6meP1j19o",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/testing/pages/integration/snapshots/index.adoc",
+            "old_string": "* `Release` CRs have their own time-based expiration, defined by the `releaseGracePeriodDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **7 days**). This *is* configurable per `ReleasePlan`.",
+            "new_string": "* `Release` CRs have their own time-based expiration, defined by the `retentionDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **14 days**). This *is* configurable per `ReleasePlan`."
+          },
+          "name": "edit_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "edit_file",
+          "args": {
+            "file_path": "/workspace/modules/testing/pages/integration/snapshots/index.adoc",
+            "old_string": "* `Release` CRs have their own time-based expiration, defined by the `releaseGracePeriodDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **7 days**). This *is* configurable per `ReleasePlan`.",
+            "new_string": "* `Release` CRs have their own time-based expiration, defined by the `retentionDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **14 days**). This *is* configurable per `ReleasePlan`."
+          },
+          "id": "toolu_vrtx_01D7kiwmArWyzur6meP1j19o",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "Successfully replaced 1 instance(s) of the string in '/workspace/modules/testing/pages/integration/snapshots/index.adoc'",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_01K9Bu33wweso8awpBhSzoCj",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/releasing/pages/create-release-plan.adoc",
+            "old_string": " releaseGracePeriodDays: <days> <.>",
+            "new_string": " retentionDays: <days> <.>"
+          },
+          "name": "edit_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "edit_file",
+          "args": {
+            "file_path": "/workspace/modules/releasing/pages/create-release-plan.adoc",
+            "old_string": " releaseGracePeriodDays: <days> <.>",
+            "new_string": " retentionDays: <days> <.>"
+          },
+          "id": "toolu_vrtx_01K9Bu33wweso8awpBhSzoCj",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "Successfully replaced 1 instance(s) of the string in '/workspace/modules/releasing/pages/create-release-plan.adoc'",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_013ifXbkH7aW37RcZpvmmzLT",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/releasing/pages/create-release-plan.adoc",
+            "old_string": "<.> Optional: The number of days a Release should be kept before being garbage collected. (default is 7 days)",
+            "new_string": "<.> Optional: The number of days a Release should be kept before being garbage collected. (default is 14 days)"
+          },
+          "name": "edit_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "edit_file",
+          "args": {
+            "file_path": "/workspace/modules/releasing/pages/create-release-plan.adoc",
+            "old_string": "<.> Optional: The number of days a Release should be kept before being garbage collected. (default is 7 days)",
+            "new_string": "<.> Optional: The number of days a Release should be kept before being garbage collected. (default is 14 days)"
+          },
+          "id": "toolu_vrtx_013ifXbkH7aW37RcZpvmmzLT",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "Successfully replaced 1 instance(s) of the string in '/workspace/modules/releasing/pages/create-release-plan.adoc'",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Now let me verify my changes:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01VrGCbMjz2HfAqU8inRQuDP",
+          "caller": null,
+          "input": {
+            "command": "grep -n \"retention\\|releaseGrace\" /workspace/modules/testing/pages/integration/snapshots/index.adoc"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        },
+        {
+          "id": "toolu_vrtx_01UXe8rnbSLwhhsppwUdSjfg",
+          "caller": null,
+          "input": {
+            "command": "grep -n \"retention\\|releaseGrace\" /workspace/modules/releasing/pages/create-release-plan.adoc"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "grep -n \"retention\\|releaseGrace\" /workspace/modules/testing/pages/integration/snapshots/index.adoc"
+          },
+          "id": "toolu_vrtx_01VrGCbMjz2HfAqU8inRQuDP",
+          "type": "tool_call"
+        },
+        {
+          "name": "execute",
+          "args": {
+            "command": "grep -n \"retention\\|releaseGrace\" /workspace/modules/releasing/pages/create-release-plan.adoc"
+          },
+          "id": "toolu_vrtx_01UXe8rnbSLwhhsppwUdSjfg",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "80:* **Mechanism:** GC is based on **retention counts**, not age. {ProductName} keeps a specific number of the most recent unreferenced snapshots and deletes the oldest ones beyond that limit.\n81:** Default retention counts:\n86:IMPORTANT: These retention counts are **not user-configurable**.\n92:**Cause**: This deadlock occurs when a large number of Snapshot CRs are protected from count-based GC by active Release CRs. While these Snapshots are protected, they still count towards the global quota. If the number of unreferenced Snapshots is below the retention limits (~500 push, 70 PR), the GC will not clear anything, but the total number of Snapshots (referenced + unreferenced) can still exceed 1024, blocking new snapshot creation.\n96:**Configure the Retention Period**: Ensure the retentionDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter retention period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.\n104:* `Release` CRs have their own time-based expiration, defined by the `retentionDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **14 days**). This *is* configurable per `ReleasePlan`.\n106:* Once the `Release` is deleted, its associated `Snapshot` CR is no longer protected and becomes eligible for count-based garbage collection if the retention limits are exceeded.\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "tool",
+      "content": "38: retentionDays: <days> <.>\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Good! But I need to also check if I updated the description properly in create-release-plan.adoc:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01SzDDrsRKdR5gbakhA9nG7a",
+          "caller": null,
+          "input": {
+            "command": "grep -n -A 1 \"retentionDays\" /workspace/modules/releasing/pages/create-release-plan.adoc"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "grep -n -A 1 \"retentionDays\" /workspace/modules/releasing/pages/create-release-plan.adoc"
+          },
+          "id": "toolu_vrtx_01SzDDrsRKdR5gbakhA9nG7a",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "38: retentionDays: <days> <.>\n39- target: managed-tenant-namespace <.>\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_01F6KraZN92HFNcr42SXqubT",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/modules/releasing/pages/create-release-plan.adoc",
+            "offset": 45,
+            "limit": 10
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/modules/releasing/pages/create-release-plan.adoc",
+            "offset": 45,
+            "limit": 10
+          },
+          "id": "toolu_vrtx_01F6KraZN92HFNcr42SXqubT",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "    46\t<.> The development team's tenant namespace.\n    47\t<.> The name of the application that you want to deploy to the managed tenant namespace.\n    48\t<.> Optional: An unstructured key used for providing data for the managed Pipeline.\n    49\t<.> Optional: Reference to the Pipeline to be executed by the release service.\n    50\t<.> Optional: The name of the service account to use in the Pipeline to gain elevated privileges. It's used only if you have defined the `pipelineRef` value.\n    51\t<.> Optional: The number of days a Release should be kept before being garbage collected. (default is 14 days)\n    52\t<.> The tenant namespace to which the system deploys the application. This tenant namespace is created by the Managed environment team (for example, your organization's SRE team)\n    53\t\n    54\t. In the development tenant namespace, apply the `ReleasePlan.yaml` file and add the resource to your cluster by running the following command:\n    55\t",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Perfect! All changes look good. Now let me commit these changes:\n\n### Step 8: Commit changes",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01WhF7eZwZgEZpTAS3NW7kBw",
+          "caller": null,
+          "input": {
+            "command": "git status"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "git status"
+          },
+          "id": "toolu_vrtx_01WhF7eZwZgEZpTAS3NW7kBw",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "On branch forge/test-e2e\nYour branch is up to date with 'origin/main'.\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   modules/releasing/pages/create-release-plan.adoc\n\tmodified:   modules/testing/pages/integration/snapshots/index.adoc\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\t.forge/\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_01Ua2BowRYeiNKMCKvHRKS72",
+          "caller": null,
+          "input": {
+            "command": "git add modules/releasing/pages/create-release-plan.adoc modules/testing/pages/integration/snapshots/index.adoc"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "git add modules/releasing/pages/create-release-plan.adoc modules/testing/pages/integration/snapshots/index.adoc"
+          },
+          "id": "toolu_vrtx_01Ua2BowRYeiNKMCKvHRKS72",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "<no output>\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_017b3iSwwQJZLgDYy2wQDYsx",
+          "caller": null,
+          "input": {
+            "command": "git diff --cached"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "git diff --cached"
+          },
+          "id": "toolu_vrtx_017b3iSwwQJZLgDYy2wQDYsx",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "diff --git a/modules/releasing/pages/create-release-plan.adoc b/modules/releasing/pages/create-release-plan.adoc\nindex 66e2f66..be937fb 100644\n--- a/modules/releasing/pages/create-release-plan.adoc\n+++ b/modules/releasing/pages/create-release-plan.adoc\n@@ -35,7 +35,7 @@ spec:\n  data: <key> <.>\n  pipelineRef: <pipeline-ref> <.>\n  serviceAccount: <service-account> <.>\n- releaseGracePeriodDays: <days> <.>\n+ retentionDays: <days> <.>\n  target: managed-tenant-namespace <.>\n ----\n \n@@ -48,7 +48,7 @@ spec:\n <.> Optional: An unstructured key used for providing data for the managed Pipeline.\n <.> Optional: Reference to the Pipeline to be executed by the release service.\n <.> Optional: The name of the service account to use in the Pipeline to gain elevated privileges. It's used only if you have defined the `pipelineRef` value.\n-<.> Optional: The number of days a Release should be kept before being garbage collected. (default is 7 days)\n+<.> Optional: The number of days a Release should be kept before being garbage collected. (default is 14 days)\n <.> The tenant namespace to which the system deploys the application. This tenant namespace is created by the Managed environment team (for example, your organization's SRE team)\n \n . In the development tenant namespace, apply the `ReleasePlan.yaml` file and add the resource to your cluster by running the following command:\ndiff --git a/modules/testing/pages/integration/snapshots/index.adoc b/modules/testing/pages/integration/snapshots/index.adoc\nindex 911ace6..99e42d2 100644\n--- a/modules/testing/pages/integration/snapshots/index.adoc\n+++ b/modules/testing/pages/integration/snapshots/index.adoc\n@@ -93,7 +93,7 @@ It's possible to encounter a situation where new Snapshots cannot be created bec\n \n **Mitigation**: The primary way to prevent this is to manage the lifecycle of your Release CRs.\n \n-**Configure the Grace Period**: Ensure the releaseGracePeriodDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter grace period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.\n+**Configure the Retention Period**: Ensure the retentionDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter retention period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.\n \n **Manual Deletion**: In an urgent situation, you can manually delete old or unnecessary Release CRs to immediately make their Snapshots eligible for GC. \n ====\n@@ -101,7 +101,7 @@ It's possible to encounter a situation where new Snapshots cannot be created bec\n === Relationship with Releases\n \n * When you create a `Release` CR from a Snapshot, that Snapshot is protected from the count-based garbage collection described above *if the Release exists*.\n-* `Release` CRs have their own time-based expiration, defined by the `releaseGracePeriodDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **7 days**). This *is* configurable per `ReleasePlan`.\n+* `Release` CRs have their own time-based expiration, defined by the `retentionDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **14 days**). This *is* configurable per `ReleasePlan`.\n * When a `Release` CR expires, it is automatically deleted.\n * Once the `Release` is deleted, its associated `Snapshot` CR is no longer protected and becomes eligible for count-based garbage collection if the retention limits are exceeded.\n \n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Perfect! The diff looks correct. Now let me commit:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01S8Z57ofFVFiN1LGPzVjJLx",
+          "caller": null,
+          "input": {
+            "command": "git commit -m \"[TEST-E2E-docs] Update documentation for ReleasePlan API changes\n\nUpdated documentation to reflect the following API changes to ReleasePlanSpec:\n- Field renamed: releaseGracePeriodDays -> retentionDays\n- Default value changed: 7 days -> 14 days\n\nFiles updated:\n- modules/releasing/pages/create-release-plan.adoc: Updated field name in example YAML and description\n- modules/testing/pages/integration/snapshots/index.adoc: Updated field references and default value\n\nNote: The auto-generated API reference (modules/reference/pages/kube-apis/release-service.adoc) was not manually updated as it should be regenerated from source.\n\nCloses: TEST-E2E-docs\""
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "git commit -m \"[TEST-E2E-docs] Update documentation for ReleasePlan API changes\n\nUpdated documentation to reflect the following API changes to ReleasePlanSpec:\n- Field renamed: releaseGracePeriodDays -> retentionDays\n- Default value changed: 7 days -> 14 days\n\nFiles updated:\n- modules/releasing/pages/create-release-plan.adoc: Updated field name in example YAML and description\n- modules/testing/pages/integration/snapshots/index.adoc: Updated field references and default value\n\nNote: The auto-generated API reference (modules/reference/pages/kube-apis/release-service.adoc) was not manually updated as it should be regenerated from source.\n\nCloses: TEST-E2E-docs\""
+          },
+          "id": "toolu_vrtx_01S8Z57ofFVFiN1LGPzVjJLx",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "[forge/test-e2e 6075f46] [TEST-E2E-docs] Update documentation for ReleasePlan API changes\n 2 files changed, 4 insertions(+), 4 deletions(-)\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Excellent! Now let me update the handoff file:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_01YL7YrziWUULTE9xjqrphbf",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/.forge/handoff.md",
+            "content": "## TEST-E2E-docs: Update stale documentation in docs repo\n\n**Status:** Completed\n\n**Changes Made:**\n- Updated `/workspace/modules/releasing/pages/create-release-plan.adoc`:\n  - Changed field name from `releaseGracePeriodDays` to `retentionDays` in example YAML (line 38)\n  - Updated default value from 7 days to 14 days in field description (line 51)\n- Updated `/workspace/modules/testing/pages/integration/snapshots/index.adoc`:\n  - Changed field name from `releaseGracePeriodDays` to `retentionDays` in two locations (lines 96, 104)\n  - Updated default value from 7 days to 14 days (line 104)\n  - Updated prose from \"Configure the Grace Period\" to \"Configure the Retention Period\" (line 96)\n\n**Key Context:**\n- The code changes were in a separate repository (api/v1alpha1/releaseplan_types.go)\n- Three main changes to ReleasePlanSpec:\n  1. Field renamed: `ReleaseGracePeriodDays` \u2192 `RetentionDays`\n  2. Default value changed: 7 \u2192 14 days\n  3. Two new fields added: `NotificationRecipients` and `RequireApproval` (not documented yet in user-facing docs)\n- The auto-generated API reference file (`modules/reference/pages/kube-apis/release-service.adoc`) was NOT manually updated as it contains a \"Generated documentation. Please do not edit.\" header and should be regenerated from source\n- Used the update-docs skill process to systematically identify stale documentation\n\n**For Next Task:**\n- The new fields `NotificationRecipients` and `RequireApproval` were added to the API but are not yet documented in user-facing documentation\n- If these features are ready for users, consider adding documentation about how to use them\n- The auto-generated API reference should be regenerated to reflect all API changes\n"
+          },
+          "name": "write_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "write_file",
+          "args": {
+            "file_path": "/workspace/.forge/handoff.md",
+            "content": "## TEST-E2E-docs: Update stale documentation in docs repo\n\n**Status:** Completed\n\n**Changes Made:**\n- Updated `/workspace/modules/releasing/pages/create-release-plan.adoc`:\n  - Changed field name from `releaseGracePeriodDays` to `retentionDays` in example YAML (line 38)\n  - Updated default value from 7 days to 14 days in field description (line 51)\n- Updated `/workspace/modules/testing/pages/integration/snapshots/index.adoc`:\n  - Changed field name from `releaseGracePeriodDays` to `retentionDays` in two locations (lines 96, 104)\n  - Updated default value from 7 days to 14 days (line 104)\n  - Updated prose from \"Configure the Grace Period\" to \"Configure the Retention Period\" (line 96)\n\n**Key Context:**\n- The code changes were in a separate repository (api/v1alpha1/releaseplan_types.go)\n- Three main changes to ReleasePlanSpec:\n  1. Field renamed: `ReleaseGracePeriodDays` \u2192 `RetentionDays`\n  2. Default value changed: 7 \u2192 14 days\n  3. Two new fields added: `NotificationRecipients` and `RequireApproval` (not documented yet in user-facing docs)\n- The auto-generated API reference file (`modules/reference/pages/kube-apis/release-service.adoc`) was NOT manually updated as it contains a \"Generated documentation. Please do not edit.\" header and should be regenerated from source\n- Used the update-docs skill process to systematically identify stale documentation\n\n**For Next Task:**\n- The new fields `NotificationRecipients` and `RequireApproval` were added to the API but are not yet documented in user-facing documentation\n- If these features are ready for users, consider adding documentation about how to use them\n- The auto-generated API reference should be regenerated to reflect all API changes\n"
+          },
+          "id": "toolu_vrtx_01YL7YrziWUULTE9xjqrphbf",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "Cannot write to /workspace/.forge/handoff.md because it already exists. Read and then make an edit, or write to a new path.",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_01Ba6GFRn5YYBNJiy84xzAD5",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/.forge/handoff.md"
+          },
+          "name": "read_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/workspace/.forge/handoff.md"
+          },
+          "id": "toolu_vrtx_01Ba6GFRn5YYBNJiy84xzAD5",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "     1\t## TEST: Update ReleasePlan spec\n     2\t\n     3\t**Status:** Completed\n     4\t\n     5\t**Changes Made:**\n     6\t- Renamed `ReleaseGracePeriodDays` to `RetentionDays` in ReleasePlanSpec\n     7\t- Changed JSON tag from `releaseGracePeriodDays` to `retentionDays`\n     8\t- Changed default retention from 7 to 14 days\n     9\t- Added `NotificationRecipients` field (list of email addresses for release event notifications)\n    10\t- Added `RequireApproval` field (boolean, when true holds releases in pending state until manually approved)",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_01GbB2ShhogerPc1PpXhLaRq",
+          "caller": null,
+          "input": {
+            "file_path": "/workspace/.forge/handoff.md",
+            "old_string": "## TEST: Update ReleasePlan spec\n\n**Status:** Completed\n\n**Changes Made:**\n- Renamed `ReleaseGracePeriodDays` to `RetentionDays` in ReleasePlanSpec\n- Changed JSON tag from `releaseGracePeriodDays` to `retentionDays`\n- Changed default retention from 7 to 14 days\n- Added `NotificationRecipients` field (list of email addresses for release event notifications)\n- Added `RequireApproval` field (boolean, when true holds releases in pending state until manually approved)",
+            "new_string": "## TEST: Update ReleasePlan spec\n\n**Status:** Completed\n\n**Changes Made:**\n- Renamed `ReleaseGracePeriodDays` to `RetentionDays` in ReleasePlanSpec\n- Changed JSON tag from `releaseGracePeriodDays` to `retentionDays`\n- Changed default retention from 7 to 14 days\n- Added `NotificationRecipients` field (list of email addresses for release event notifications)\n- Added `RequireApproval` field (boolean, when true holds releases in pending state until manually approved)\n\n## TEST-E2E-docs: Update stale documentation in docs repo\n\n**Status:** Completed\n\n**Changes Made:**\n- Updated `/workspace/modules/releasing/pages/create-release-plan.adoc`:\n  - Changed field name from `releaseGracePeriodDays` to `retentionDays` in example YAML (line 38)\n  - Updated default value from 7 days to 14 days in field description (line 51)\n- Updated `/workspace/modules/testing/pages/integration/snapshots/index.adoc`:\n  - Changed field name from `releaseGracePeriodDays` to `retentionDays` in two locations (lines 96, 104)\n  - Updated default value from 7 days to 14 days (line 104)\n  - Updated prose from \"Configure the Grace Period\" to \"Configure the Retention Period\" (line 96)\n\n**Key Context:**\n- The code changes were in a separate repository (api/v1alpha1/releaseplan_types.go)\n- Three main changes to ReleasePlanSpec:\n  1. Field renamed: `ReleaseGracePeriodDays` \u2192 `RetentionDays`\n  2. Default value changed: 7 \u2192 14 days\n  3. Two new fields added: `NotificationRecipients` and `RequireApproval` (not documented yet in user-facing docs)\n- The auto-generated API reference file (`modules/reference/pages/kube-apis/release-service.adoc`) was NOT manually updated as it contains a \"Generated documentation. Please do not edit.\" header and should be regenerated from source\n- Used the update-docs skill process to systematically identify stale documentation\n\n**For Next Task:**\n- The new fields `NotificationRecipients` and `RequireApproval` were added to the API but are not yet documented in user-facing documentation\n- If these features are ready for users, consider adding documentation about how to use them\n- The auto-generated API reference should be regenerated to reflect all API changes"
+          },
+          "name": "edit_file",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "edit_file",
+          "args": {
+            "file_path": "/workspace/.forge/handoff.md",
+            "old_string": "## TEST: Update ReleasePlan spec\n\n**Status:** Completed\n\n**Changes Made:**\n- Renamed `ReleaseGracePeriodDays` to `RetentionDays` in ReleasePlanSpec\n- Changed JSON tag from `releaseGracePeriodDays` to `retentionDays`\n- Changed default retention from 7 to 14 days\n- Added `NotificationRecipients` field (list of email addresses for release event notifications)\n- Added `RequireApproval` field (boolean, when true holds releases in pending state until manually approved)",
+            "new_string": "## TEST: Update ReleasePlan spec\n\n**Status:** Completed\n\n**Changes Made:**\n- Renamed `ReleaseGracePeriodDays` to `RetentionDays` in ReleasePlanSpec\n- Changed JSON tag from `releaseGracePeriodDays` to `retentionDays`\n- Changed default retention from 7 to 14 days\n- Added `NotificationRecipients` field (list of email addresses for release event notifications)\n- Added `RequireApproval` field (boolean, when true holds releases in pending state until manually approved)\n\n## TEST-E2E-docs: Update stale documentation in docs repo\n\n**Status:** Completed\n\n**Changes Made:**\n- Updated `/workspace/modules/releasing/pages/create-release-plan.adoc`:\n  - Changed field name from `releaseGracePeriodDays` to `retentionDays` in example YAML (line 38)\n  - Updated default value from 7 days to 14 days in field description (line 51)\n- Updated `/workspace/modules/testing/pages/integration/snapshots/index.adoc`:\n  - Changed field name from `releaseGracePeriodDays` to `retentionDays` in two locations (lines 96, 104)\n  - Updated default value from 7 days to 14 days (line 104)\n  - Updated prose from \"Configure the Grace Period\" to \"Configure the Retention Period\" (line 96)\n\n**Key Context:**\n- The code changes were in a separate repository (api/v1alpha1/releaseplan_types.go)\n- Three main changes to ReleasePlanSpec:\n  1. Field renamed: `ReleaseGracePeriodDays` \u2192 `RetentionDays`\n  2. Default value changed: 7 \u2192 14 days\n  3. Two new fields added: `NotificationRecipients` and `RequireApproval` (not documented yet in user-facing docs)\n- The auto-generated API reference file (`modules/reference/pages/kube-apis/release-service.adoc`) was NOT manually updated as it contains a \"Generated documentation. Please do not edit.\" header and should be regenerated from source\n- Used the update-docs skill process to systematically identify stale documentation\n\n**For Next Task:**\n- The new fields `NotificationRecipients` and `RequireApproval` were added to the API but are not yet documented in user-facing documentation\n- If these features are ready for users, consider adding documentation about how to use them\n- The auto-generated API reference should be regenerated to reflect all API changes"
+          },
+          "id": "toolu_vrtx_01GbB2ShhogerPc1PpXhLaRq",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "Successfully replaced 1 instance(s) of the string in '/workspace/.forge/handoff.md'",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "citations": null,
+          "text": "Perfect! Let me verify the final state:",
+          "type": "text"
+        },
+        {
+          "id": "toolu_vrtx_016r35J45a2vgcb5fuPr95kq",
+          "caller": null,
+          "input": {
+            "command": "git log --oneline -1"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "git log --oneline -1"
+          },
+          "id": "toolu_vrtx_016r35J45a2vgcb5fuPr95kq",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "6075f46 [TEST-E2E-docs] Update documentation for ReleasePlan API changes\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": [
+        {
+          "id": "toolu_vrtx_014LZ7so63kt8RhcembKBcAE",
+          "caller": null,
+          "input": {
+            "command": "git status"
+          },
+          "name": "execute",
+          "type": "tool_use"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "execute",
+          "args": {
+            "command": "git status"
+          },
+          "id": "toolu_vrtx_014LZ7so63kt8RhcembKBcAE",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "On branch forge/test-e2e\nYour branch is ahead of 'origin/main' by 1 commit.\n  (use \"git push\" to publish your local commits)\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\t.forge/\n\nnothing added to commit but untracked files present (use \"git add\" to track)\n\n[Command succeeded with exit code 0]",
+      "tool_calls": null
+    },
+    {
+      "role": "ai",
+      "content": "Excellent! The task is complete. Let me provide the final output:\n\n---\n\n## DOCS_UPDATED\n\nUpdated:\n- **modules/releasing/pages/create-release-plan.adoc** - Updated the ReleasePlan example YAML to change field name from `releaseGracePeriodDays` to `retentionDays`, and updated the field description to reflect the new default value of 14 days (previously 7 days)\n\n- **modules/testing/pages/integration/snapshots/index.adoc** - Updated two references to the renamed field from `releaseGracePeriodDays` to `retentionDays`, updated the default value from 7 days to 14 days, and changed prose from \"Configure the Grace Period\" to \"Configure the Retention Period\" for consistency\n\n**Note:** The auto-generated API reference file (`modules/reference/pages/kube-apis/release-service.adoc`) was identified as stale but not manually updated, as it contains a \"Generated documentation. Please do not edit.\" header and should be regenerated from source rather than manually patched.\n\n**Summary of API changes reflected:**\n1. Field renamed: `ReleaseGracePeriodDays` \u2192 `RetentionDays` \n2. Default value changed: 7 days \u2192 14 days\n3. New fields added (`NotificationRecipients`, `RequireApproval`) are not yet documented in user-facing docs, as they were not previously mentioned and would require new documentation sections rather than updates to existing content.",
+      "tool_calls": []
+    }
+  ]
+}
