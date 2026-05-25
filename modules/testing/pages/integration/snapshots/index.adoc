@@ -93,7 +93,7 @@ It's possible to encounter a situation where new Snapshots cannot be created bec
 
 **Mitigation**: The primary way to prevent this is to manage the lifecycle of your Release CRs.
 
-**Configure the Grace Period**: Ensure the releaseGracePeriodDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter grace period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.
+**Configure the Retention Period**: Ensure the retentionDays field in your ReleasePlan is set to a reasonable value that reflects your team's release cadence. A shorter retention period ensures Release CRs expire more quickly, freeing up their associated Snapshots for garbage collection.
 
 **Manual Deletion**: In an urgent situation, you can manually delete old or unnecessary Release CRs to immediately make their Snapshots eligible for GC. 
 ====
@@ -101,7 +101,7 @@ It's possible to encounter a situation where new Snapshots cannot be created bec
 === Relationship with Releases
 
 * When you create a `Release` CR from a Snapshot, that Snapshot is protected from the count-based garbage collection described above *if the Release exists*.
-* `Release` CRs have their own time-based expiration, defined by the `releaseGracePeriodDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **7 days**). This *is* configurable per `ReleasePlan`.
+* `Release` CRs have their own time-based expiration, defined by the `retentionDays` field in the associated xref:releasing:create-release-plan.adoc[`ReleasePlan`] (default: **14 days**). This *is* configurable per `ReleasePlan`.
 * When a `Release` CR expires, it is automatically deleted.
 * Once the `Release` is deleted, its associated `Snapshot` CR is no longer protected and becomes eligible for count-based garbage collection if the retention limits are exceeded.
 
